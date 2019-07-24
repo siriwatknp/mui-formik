@@ -13,9 +13,7 @@ const baseTheme = createMuiTheme();
 const ThemeDecorator = storyFn => (
   <>
     <CssBaseline />
-    <ThemeProvider theme={baseTheme}>
-      {storyFn()}
-    </ThemeProvider>
+    <ThemeProvider theme={baseTheme}>{storyFn()}</ThemeProvider>
   </>
 );
 
