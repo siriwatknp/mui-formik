@@ -6,10 +6,14 @@ import { linkTo } from '@storybook/addon-links';
 
 import LoginForm from './forms/LoginForm';
 import SignUpForm from './forms/SignUpForm';
+import LanguageForm from './forms/LanguageForm';
+import ProfileForm from './forms/ProfileForm';
 
 storiesOf('Form', module)
   .add('Login form', () => <LoginForm />)
-  .add('Sign Up Form', () => <SignUpForm />);
+  .add('Sign Up Form', () => <SignUpForm />)
+  .add('Language Form', () => <LanguageForm />)
+  .add('Profile Form', () => <ProfileForm />);
 
 // import { Button, Welcome } from '@storybook/react/demo';
 

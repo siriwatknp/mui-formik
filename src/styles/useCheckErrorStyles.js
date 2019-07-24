@@ -1,8 +1,9 @@
 import { makeStyles } from '@material-ui/styles';
+import { getErrorFromField } from '../utils/functions';
 
 const useCheckErrorStyles = makeStyles(({ palette }) => ({
-  root: ({ name, errors, touched }) => {
-    const errorShown = touched[name] && Boolean(errors[name]);
+  root: ({ field, form }) => {
+    const [errorShown] = getErrorFromField({ field, form });
     return errorShown
       ? {
           color: palette.error.main,

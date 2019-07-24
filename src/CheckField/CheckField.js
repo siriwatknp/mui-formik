@@ -5,21 +5,18 @@ import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import MuiCheckbox from '@material-ui/core/Checkbox/Checkbox';
 import useCheckErrorStyles from '../styles/useCheckErrorStyles';
+import { getErrorFromField } from '../utils/functions';
 
 const Component = ({
-  field: { value, ...field },
-  form: { touched, errors },
+  field,
+  field: { value },
+  form,
   helperText,
   label,
   ...props
 }) => {
-  const checkClasses = useCheckErrorStyles({
-    touched,
-    errors,
-    name: field.name,
-  });
-  const errorText = errors[field.name];
-  const errorShown = touched[field.name] && Boolean(errorText);
+  const checkClasses = useCheckErrorStyles({ field, form });
+  const [errorShown, errorText] = getErrorFromField({ field, form });
   return (
     <FormControl error={errorShown} {...props}>
       <FormControlLabel

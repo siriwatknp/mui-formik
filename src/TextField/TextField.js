@@ -1,6 +1,7 @@
 import React from 'react';
 import { Field, FastField } from 'formik';
 import MuiTextField from '@material-ui/core/TextField';
+import { getErrorFromField } from '../utils/functions';
 
 export const baseProps = {
   margin: 'normal',
@@ -8,14 +9,8 @@ export const baseProps = {
   variant: 'outlined',
 };
 
-const Component = ({
-  field = {},
-  form: { touched, errors } = {},
-  helperText,
-  ...props
-}) => {
-  const errorText = errors[field.name];
-  const errorShown = touched[field.name] && Boolean(errorText);
+const Component = ({ field, form, helperText, ...props }) => {
+  const [errorShown, errorText] = getErrorFromField({ field, form });
   return (
     <MuiTextField
       error={errorShown}
