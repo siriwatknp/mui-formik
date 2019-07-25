@@ -1,38 +1,14 @@
 import React from 'react';
 
 import { storiesOf } from '@storybook/react';
-import { Formik } from 'formik';
+import { boolean } from '@storybook/addon-knobs';
 import * as Yup from 'yup';
-import Button from '@material-ui/core/Button';
 import Link from '@material-ui/core/Link';
-import Paper from '@material-ui/core/Paper';
 
-import useSubmitStyles from '../src/styles/useSubmitStyles';
+import Form from './forms/Form';
 import TextField from '../src/TextField';
 import CheckField from '../src/CheckField';
-
-const Form = ({ children, ...props }) => {
-  const submitClasses = useSubmitStyles();
-  return (
-    <Paper style={{ maxWidth: 375, padding: 16, margin: 'auto' }}>
-      <Formik onSubmit={values => console.log(values)} {...props}>
-        {({ handleSubmit }) => (
-          <form onSubmit={handleSubmit}>
-            {children}
-            <Button
-              classes={submitClasses}
-              type={'submit'}
-              variant={'contained'}
-              color={'primary'}
-            >
-              Submit
-            </Button>
-          </form>
-        )}
-      </Formik>
-    </Paper>
-  );
-};
+import MultiSelectField from '../src/MultiSelectField';
 
 const createSchema = shape => Yup.object().shape(shape);
 
@@ -74,5 +50,36 @@ storiesOf('Mui Formik', module)
           </>
         }
       />
+    </Form>
+  ))
+  .add('MultiSelect Field', () => (
+    <Form
+      initialValues={{ friends: [] }}
+      validationSchema={createSchema({
+        friends: Yup.array()
+          .of(Yup.string())
+          .required('You must have friends')
+          .min(3, 'Minimum of 3 friends'),
+      })}
+      onSubmit={values => console.log('values', values)}
+    >
+      {() => (
+        <MultiSelectField
+          {...MultiSelectField.baseProps}
+          label={'Friends'}
+          placeholder={"Type your friend's name"}
+          name={'friends'}
+          selectedItemExcluded={boolean('Selected item excluded', false)}
+          options={[
+            { label: 'Jun', value: 'jun' },
+            { label: 'Mike', value: 'mike' },
+            { label: 'Tony', value: 'tony' },
+            { label: 'Strange', value: 'strange' },
+            { label: 'Thor', value: 'thor' },
+            { label: 'Steven', value: 'steven' },
+            { label: 'Justin', value: 'justin' },
+          ]}
+        />
+      )}
     </Form>
   ));

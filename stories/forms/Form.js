@@ -9,9 +9,9 @@ const Form = ({ children, ...props }) => {
   return (
     <Paper style={{ maxWidth: 375, padding: 16, margin: 'auto' }}>
       <Formik onSubmit={values => console.log(values)} {...props}>
-        {({ handleSubmit }) => (
+        {({ handleSubmit, ...rest }) => (
           <form onSubmit={handleSubmit}>
-            {children}
+            {typeof children === 'function' ? children(rest) : children}
             <Button
               classes={submitClasses}
               type={'submit'}
@@ -27,8 +27,7 @@ const Form = ({ children, ...props }) => {
   );
 };
 
-
 Form.propTypes = {};
 Form.defaultProps = {};
 
-export default Form
+export default Form;

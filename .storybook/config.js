@@ -3,6 +3,7 @@ import { configure, addDecorator } from '@storybook/react';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
+import { withKnobs } from '@storybook/addon-knobs';
 // import { setConsoleOptions, withConsole } from '@storybook/addon-console';
 
 // setConsoleOptions({
@@ -21,6 +22,7 @@ const ThemeDecorator = storyFn => (
 const req = require.context('../stories', true, /\.stories\.js$/);
 function loadStories() {
   addDecorator(ThemeDecorator);
+  addDecorator(withKnobs);
   req.keys().forEach(filename => req(filename));
 }
 
