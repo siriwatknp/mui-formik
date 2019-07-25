@@ -73,3 +73,8 @@ export const findFirstErrorKey = formik => {
   if (!errorValues || typeof errorValues !== 'object') return errorValues;
   return Object.keys(errorValues)[0];
 };
+
+export const getMaxItems = (items, max = false) => {
+  if (typeof max !== 'number' || max <= 0) return items;
+  return items.slice(0, max);
+};

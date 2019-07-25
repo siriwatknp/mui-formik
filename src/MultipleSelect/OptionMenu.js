@@ -1,21 +1,13 @@
 import React from 'react';
-import { makeStyles } from '@material-ui/styles';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import InboxTwoTone from '@material-ui/icons/InboxTwoTone';
 import Typography from '@material-ui/core/Typography';
-
-const usePaperStyles = makeStyles(() => ({
-  root: {
-    position: 'absolute',
-    width: '100%',
-    transform: 'translateY(4px)',
-    maxHeight: 256,
-    overflow: 'auto',
-    zIndex: 1,
-  },
-}));
+import {
+  useContainerStyles,
+  useOptionStyles,
+} from '../styles/useMultiSelectStyles';
 
 const OptionMenu = ({
   options,
@@ -28,7 +20,8 @@ const OptionMenu = ({
   renderEmpty,
   ...props
 }) => {
-  const classes = usePaperStyles(props);
+  const containerClasses = useContainerStyles(props);
+  const optionClasses = useOptionStyles();
   const shouldRenderOption = value => {
     if (typeof filterOption === 'function') return filterOption(value);
     if (selectedItemExcluded) return !selectedItems.includes(value);
@@ -56,12 +49,13 @@ const OptionMenu = ({
     );
   };
   return (
-    <Paper classes={classes}>
+    <Paper classes={containerClasses}>
       {options.map(({ label, value }) =>
         shouldRenderOption(value) ? (
           <MenuItem
             id={`${menuId}${value}`}
             key={value}
+            classes={optionClasses}
             selected={selectedItems.includes(value)}
             onClick={e => onClickItem(e, value)}
           >

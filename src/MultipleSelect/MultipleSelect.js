@@ -1,29 +1,13 @@
 import React, { useState, useRef } from 'react';
 import without from 'lodash/without';
-import { makeStyles } from '@material-ui/styles';
-import Box from '@material-ui/core/Box';
 import TextField from '@material-ui/core/TextField';
 import Chip from '@material-ui/core/Chip';
 import OptionMenu from './OptionMenu';
-
-const useChipStyles = makeStyles(({ spacing }) => ({
-  root: {
-    marginRight: spacing(1),
-    marginBottom: spacing(0.5),
-  },
-}));
-
-const useInputBaseStyles = makeStyles(() => ({
-  root: {
-    flexWrap: 'wrap',
-    padding: '12px 0 8px 12px',
-  },
-  input: {
-    padding: '8px 8px 9px 4px',
-    width: 'auto',
-    flexGrow: 1,
-  },
-}));
+import {
+  useChipStyles,
+  useInputBaseStyles,
+  useRootStyles,
+} from '../styles/useMultiSelectStyles';
 
 const MultipleSelect = ({
   options,
@@ -42,6 +26,9 @@ const MultipleSelect = ({
   inputProps,
   ...props
 }) => {
+  const chipClasses = useChipStyles();
+  const inputBaseClasses = useInputBaseStyles(InputProps);
+  const rootClasses = useRootStyles({ fullWidth, ...props });
   const inputEl = useRef(null);
   const [inputValue, setInputValue] = useState('');
   const [open, setOpen] = useState(false);
@@ -49,15 +36,13 @@ const MultipleSelect = ({
     const item = options.find(option => option.value === itemValue);
     return item ? item.label : '';
   };
-  const chipClasses = useChipStyles();
-  const inputBaseClasses = useInputBaseStyles(InputProps);
   const handleKeyDown = e => {
     if (value.length && !inputValue.length && e.key === 'Backspace') {
       onChange(value.slice(0, value.length - 1));
     }
   };
   return (
-    <Box position={'relative'} display={fullWidth ? 'block' : 'inline-block'}>
+    <div className={rootClasses.root}>
       <TextField
         fullWidth={fullWidth}
         inputRef={inputEl}
@@ -117,10 +102,7 @@ const MultipleSelect = ({
           renderEmpty={renderEmpty}
           menuId={menuId}
           onClickItem={(_, val) => {
-            console.log('value', value);
-            console.log('val', val);
             if (!value.includes(val)) {
-              console.log('set!');
               setInputValue('');
             }
             onChange(
@@ -131,7 +113,7 @@ const MultipleSelect = ({
           }}
         />
       )}
-    </Box>
+    </div>
   );
 };
 

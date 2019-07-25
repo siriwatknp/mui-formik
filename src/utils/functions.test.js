@@ -4,6 +4,7 @@ import {
   isPairs,
   getErrorFromField,
   findFirstErrorKey,
+  getMaxItems,
 } from './functions';
 
 const breakpoints = createBreakpoints({});
@@ -83,4 +84,13 @@ describe('functions', () => {
     expect(findFirstErrorKey({ field, form: form1 })).toEqual('en');
     expect(findFirstErrorKey({ field, form: form2 })).toEqual('th');
   });
+
+  it('should return correct items', () => {
+    const items = [0, 1, 2, 3, 4, 5];
+    expect(getMaxItems(items, false)).toEqual(items);
+    expect(getMaxItems(items, null)).toEqual(items);
+    expect(getMaxItems(items, {})).toEqual(items);
+    expect(getMaxItems(items, 4)).toEqual([0, 1, 2, 3]);
+  });
+
 });
