@@ -48,6 +48,12 @@ export const getErrorFromField = formik => {
   }
   // use getIn to support name in lodash-like dot paths
   // ex. field.name = 'social.twitter'
+  if (!field.name) {
+    throw new Error(
+      // eslint-disable-next-line max-len
+      "field should have a name, did you forget to pass 'name' to Field?",
+    );
+  }
   const errorText = getIn(form.errors, field.name) || '';
   const errorShown =
     (getIn(form.touched, field.name) || false) && Boolean(errorText);
@@ -74,7 +80,85 @@ export const findFirstErrorKey = formik => {
   return Object.keys(errorValues)[0];
 };
 
-export const getMaxItems = (items, max = false) => {
+export const getMaxItems = (max = false) => items => {
   if (typeof max !== 'number' || max <= 0) return items;
   return items.slice(0, max);
+};
+
+export const filterByInputValue = (inputValue = '', optionValue = '') =>
+  !inputValue || optionValue.toLowerCase().includes(inputValue.toLowerCase());
+
+const isValidFunction = fn => typeof fn === 'function';
+
+const tryFunction = fn => (isValidFunction(fn) ? fn : arg => arg);
+
+const reduceFunctions = (...funcs) => {
+  if (funcs.length === 0) {
+    return arg => arg;
+  }
+
+  if (funcs.length === 1) {
+    return tryFunction(funcs[0]);
+  }
+
+  return funcs.reduce((a, b) => (...args) => a(tryFunction(b)(...args)));
+};
+
+export const filterSelectedItems = (selectedItems, shouldFilter) => items =>
+  shouldFilter ? items.filter(item => !selectedItems.includes(item)) : items;
+
+export const filterSelectedItem = (selectedItem, shouldFilter) => items =>
+  shouldFilter && selectedItem
+    ? items.filter(item =>
+        typeof selectedItem === 'string'
+          ? selectedItem
+          : selectedItem.value !== item.value,
+      )
+    : items;
+
+export const filterBy = (filterOption, inputValue) => items => {
+  if (!isValidFunction(filterOption)) return items;
+  return items.filter(item => filterOption(inputValue, item.value));
+};
+
+export const getSelectOptions = (
+  options,
+  {
+    maxOptionOutput,
+    filterOption,
+    getOptions,
+    inputValue,
+    selectedItemExcluded,
+    selectedItem,
+  },
+) => {
+  return reduceFunctions(
+    getMaxItems(maxOptionOutput),
+    filterSelectedItem(selectedItem, selectedItemExcluded),
+    filterBy(filterOption, inputValue),
+    isValidFunction(getOptions)
+      ? items => getOptions(items, inputValue)
+      : arg => arg,
+  )(options);
+};
+
+export const getMultiSelectOptions = (
+  options,
+  {
+    maxOptionOutput,
+    selectedItemExcluded,
+    filterOption,
+    getOptions,
+    inputValue,
+    selectedItems,
+  },
+) => {
+  return reduceFunctions(
+    getMaxItems(maxOptionOutput),
+    filterSelectedItems(selectedItems, selectedItemExcluded),
+    filterBy(filterOption, inputValue),
+    isValidFunction(getOptions)
+      ? items => getOptions(items, inputValue)
+      : arg => arg,
+  )(options);
 };

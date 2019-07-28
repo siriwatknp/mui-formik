@@ -5,6 +5,9 @@ import Form from './Form';
 import TabsForm from '../../src/TabsForm';
 import TextField from '../../src/TextField';
 import CheckField from '../../src/CheckField';
+import DsSelectField from '../../src/DsSelectField';
+import DsMultiSelectField from '../../src/DsMultiSelectField';
+import { HEROES, COUNTRIES } from '../mock/options';
 
 const validationSchema = Yup.object().shape({
   profile: Yup.object().shape({
@@ -13,9 +16,14 @@ const validationSchema = Yup.object().shape({
       lastName: Yup.string().required('Required'),
     }),
     favorite: Yup.object().shape({
-      food: Yup.string().required('Required'),
-      juice: Yup.string().required('Required'),
-      liked: Yup.boolean().oneOf([true], 'I think you need to like it'),
+      hero: Yup.string().required('Hero is required'),
+      countries: Yup.array()
+        .of(Yup.string())
+        .required('You must have countries')
+        .min(3, 'Minimum of 3 countries'),
+      // food: Yup.string().required('Required'),
+      // juice: Yup.string().required('Required'),
+      // liked: Yup.boolean().oneOf([true], 'I think you need to like it'),
     }),
   }),
   accepted: Yup.boolean().oneOf([true], 'You must accept our terms of service'),
@@ -30,9 +38,11 @@ const ProfileForm = () => (
           lastName: '',
         },
         favorite: {
-          food: '',
-          juice: '',
-          liked: false,
+          hero: '',
+          countries: [],
+          // food: '',
+          // juice: '',
+          // liked: false,
         },
       },
       accepted: false,
@@ -67,21 +77,21 @@ const ProfileForm = () => (
           )}
           {tab === 'favorite' && (
             <>
-              <TextField
-                {...TextField.baseProps}
-                name={`profile.${tab}.food`}
-                label={'Food'}
+              <DsSelectField
+                {...DsSelectField.baseProps}
+                name={`profile.${tab}.hero`}
+                options={HEROES}
+                itemToValue={item => (item ? item.id : '')}
+                itemToLabel={item => (item ? item.name : '')}
+                label={'Hero'}
                 required
               />
-              <TextField
-                {...TextField.baseProps}
-                name={`profile.${tab}.juice`}
-                label={'Juice'}
-              />
-              <CheckField
-                {...CheckField.baseProps}
-                name={`profile.${tab}.liked`}
-                label={'I like this form'}
+              <DsMultiSelectField
+                {...DsMultiSelectField.baseProps}
+                options={COUNTRIES}
+                name={`profile.${tab}.countries`}
+                label={'Countries'}
+                placeholder={'Type a name'}
               />
             </>
           )}

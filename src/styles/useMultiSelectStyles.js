@@ -7,7 +7,16 @@ export const useChipStyles = makeStyles(({ spacing }) => ({
   },
 }));
 
-export const useInputBaseStyles = makeStyles(() => ({
+export const useSelectInputBaseStyles = makeStyles(({ spacing }) => ({
+  adornedEnd: {
+    // '&.MuiInputBase-adornedEnd': {
+    //   paddingRight: spacing(1),
+    // },
+    paddingRight: spacing(1),
+  },
+}));
+
+export const useMultiSelectInputBaseStyles = makeStyles(({ spacing }) => ({
   root: {
     flexWrap: 'wrap',
     padding: '12px 0 8px 12px',
@@ -16,6 +25,9 @@ export const useInputBaseStyles = makeStyles(() => ({
     padding: '8px 8px 9px 4px',
     width: 'auto',
     flexGrow: 1,
+  },
+  adornedEnd: {
+    paddingRight: spacing(8),
   },
 }));
 
@@ -26,7 +38,7 @@ export const useContainerStyles = makeStyles(() => ({
     transform: 'translateY(4px)',
     maxHeight: 256,
     overflow: 'auto',
-    zIndex: 1,
+    zIndex: 5,
   },
 }));
 
@@ -60,5 +72,14 @@ export const useOptionStyles = makeStyles(({ palette }) => ({
         backgroundColor: palette.primary.light,
       },
     },
+  },
+}));
+
+export const useToggleStyles = makeStyles(() => ({
+  root: {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translateY(-50%)',
+    right: 8,
   },
 }));

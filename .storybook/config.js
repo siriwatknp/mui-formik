@@ -1,6 +1,7 @@
 import React from 'react';
 import { configure, addDecorator } from '@storybook/react';
 import CssBaseline from '@material-ui/core/CssBaseline';
+import * as Core from '@material-ui/core';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/styles';
 import { withKnobs } from '@storybook/addon-knobs';
@@ -9,7 +10,6 @@ import { withKnobs } from '@storybook/addon-knobs';
 // setConsoleOptions({
 //   panelExclude: [],
 // });
-
 const baseTheme = createMuiTheme();
 const ThemeDecorator = storyFn => (
   <>

@@ -5,7 +5,54 @@ import {
   getErrorFromField,
   findFirstErrorKey,
   getMaxItems,
+  getMultiSelectOptions,
+  filterByInputValue,
 } from './functions';
+
+export const COUNTRIES = [
+  { label: 'Afghanistan' },
+  { label: 'Aland Islands' },
+  { label: 'Albania' },
+  { label: 'Algeria' },
+  { label: 'American Samoa' },
+  { label: 'Andorra' },
+  { label: 'Angola' },
+  { label: 'Anguilla' },
+  { label: 'Antarctica' },
+  { label: 'Antigua and Barbuda' },
+  { label: 'Argentina' },
+  { label: 'Armenia' },
+  { label: 'Aruba' },
+  { label: 'Australia' },
+  { label: 'Austria' },
+  { label: 'Azerbaijan' },
+  { label: 'Bahamas' },
+  { label: 'Bahrain' },
+  { label: 'Bangladesh' },
+  { label: 'Barbados' },
+  { label: 'Belarus' },
+  { label: 'Belgium' },
+  { label: 'Belize' },
+  { label: 'Benin' },
+  { label: 'Bermuda' },
+  { label: 'Bhutan' },
+  { label: 'Bolivia, Plurinational State of' },
+  { label: 'Bonaire, Sint Eustatius and Saba' },
+  { label: 'Bosnia and Herzegovina' },
+  { label: 'Botswana' },
+  { label: 'Bouvet Island' },
+  { label: 'Brazil' },
+  { label: 'British Indian Ocean Territory' },
+  { label: 'Brunei Darussalam' },
+].map(({ label }) => ({
+  label,
+  value: label.toLowerCase(),
+}));
+
+const getOptions = (items, inputValue) =>
+  inputValue
+    ? items.filter(item => filterByInputValue(inputValue, item.value))
+    : items;
 
 const breakpoints = createBreakpoints({});
 
@@ -69,7 +116,9 @@ describe('functions', () => {
   it('should return correct error', () => {
     expect(() => getErrorFromField()).toThrow();
     const field1 = { name: 'email' };
+    const field2 = { name: undefined };
     const form1 = { errors: {}, touched: {} };
+    expect(() => getErrorFromField({ field: field2, form: form1 })).toThrow();
     expect(getErrorFromField({ field: field1, form: form1 })).toEqual([
       false,
       '',
@@ -87,10 +136,62 @@ describe('functions', () => {
 
   it('should return correct items', () => {
     const items = [0, 1, 2, 3, 4, 5];
-    expect(getMaxItems(items, false)).toEqual(items);
-    expect(getMaxItems(items, null)).toEqual(items);
-    expect(getMaxItems(items, {})).toEqual(items);
-    expect(getMaxItems(items, 4)).toEqual([0, 1, 2, 3]);
+    expect(getMaxItems(false)(items)).toEqual(items);
+    expect(getMaxItems(null)(items)).toEqual(items);
+    expect(getMaxItems({})(items)).toEqual(items);
+    expect(getMaxItems(4)(items)).toEqual([0, 1, 2, 3]);
   });
 
+  it('should return correct result', () => {
+    expect(
+      getMultiSelectOptions(COUNTRIES, {
+        maxOptionOutput: false,
+        selectedItemExcluded: false,
+        filterOption: false,
+        getOptions: false,
+        inputValue: '',
+        selectedItems: [],
+      }),
+    ).toEqual(COUNTRIES);
+    expect(
+      getMultiSelectOptions(COUNTRIES, {
+        maxOptionOutput: 5,
+        selectedItemExcluded: false,
+        filterOption: false,
+        getOptions: false,
+        inputValue: '',
+        selectedItems: [],
+      }).length,
+    ).toEqual(5);
+    expect(
+      getMultiSelectOptions(COUNTRIES, {
+        maxOptionOutput: false,
+        selectedItemExcluded: true,
+        filterOption: false,
+        getOptions: false,
+        inputValue: '',
+        selectedItems: [COUNTRIES[0], COUNTRIES[3]],
+      }).length,
+    ).toEqual(COUNTRIES.length - 2);
+    expect(
+      getMultiSelectOptions(COUNTRIES, {
+        maxOptionOutput: false,
+        selectedItemExcluded: false,
+        filterOption: filterByInputValue,
+        getOptions: false,
+        inputValue: 'albania',
+        selectedItems: [],
+      }).length,
+    ).toEqual(1);
+    expect(
+      getMultiSelectOptions(COUNTRIES, {
+        maxOptionOutput: false,
+        selectedItemExcluded: false,
+        filterOption: false,
+        getOptions,
+        inputValue: 'albania',
+        selectedItems: [],
+      }).length,
+    ).toEqual(1);
+  });
 });

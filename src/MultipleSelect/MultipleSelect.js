@@ -1,52 +1,68 @@
 import React, { useState, useRef } from 'react';
-import without from 'lodash/without';
 import TextField from '@material-ui/core/TextField';
 import Chip from '@material-ui/core/Chip';
-import OptionMenu from './OptionMenu';
+import OptionMenu from '../OptionMenu';
 import {
   useChipStyles,
-  useInputBaseStyles,
+  useMultiSelectInputBaseStyles,
   useRootStyles,
 } from '../styles/useMultiSelectStyles';
+import { filterByInputValue, getMultiSelectOptions } from '../utils/functions';
+import {
+  injectMenuProps,
+  injectTextFieldProps,
+  getMultiSelectLogic,
+  defaultItemToLabel,
+  defaultItemToValue,
+} from '../logics/select';
+import Collection from '../utils/collection';
 
-const MultipleSelect = ({
-  options,
-  value,
-  menuId,
-  chipId,
-  onChangeInput,
-  onChange,
-  onFocus,
-  onBlur,
-  selectedItemExcluded,
-  filterOption,
-  renderEmpty,
-  fullWidth,
-  InputProps,
-  inputProps,
-  ...props
-}) => {
-  const chipClasses = useChipStyles();
-  const inputBaseClasses = useInputBaseStyles(InputProps);
-  const rootClasses = useRootStyles({ fullWidth, ...props });
-  const inputEl = useRef(null);
+const MultipleSelect = props => {
+  const {
+    options,
+    menuId,
+    chipId,
+    onChangeInput,
+    onChange,
+    onFocus,
+    onBlur,
+    InputProps,
+    inputProps,
+    itemToLabel,
+    itemToValue,
+    fullOptionReturned,
+    rootClasses: extRootClasses,
+    chipClasses: extChipClasses,
+    chipProps,
+    inputBaseClasses: extInputBaseClasses,
+  } = props;
+  const rootClasses = useRootStyles({ ...props, classes: extRootClasses });
+  const chipClasses = useChipStyles({ classes: extChipClasses });
+  const inputBaseClasses = useMultiSelectInputBaseStyles({
+    classes: extInputBaseClasses,
+  });
+  const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
+  const [selectedItems, setSelectedItems] = useState([]);
   const [open, setOpen] = useState(false);
-  const getLabel = itemValue => {
-    const item = options.find(option => option.value === itemValue);
-    return item ? item.label : '';
+  const returnValue = cb => (items, ...args) => {
+    return fullOptionReturned ? cb(items, ...args) : cb(items.map(itemToValue));
   };
-  const handleKeyDown = e => {
-    if (value.length && !inputValue.length && e.key === 'Backspace') {
-      onChange(value.slice(0, value.length - 1));
-    }
+  const handleChange = returnValue(onChange);
+  const handleBlur = returnValue(onBlur);
+  const stateUpdater = newItems => {
+    setSelectedItems(newItems);
+    handleChange(newItems);
   };
+  const { removeItem, handleSelection, handleKeyDown } = getMultiSelectLogic(
+    Collection(selectedItems, itemToValue),
+    stateUpdater,
+  );
   return (
     <div className={rootClasses.root}>
       <TextField
-        fullWidth={fullWidth}
-        inputRef={inputEl}
-        {...props}
+        {...injectTextFieldProps({ ...props, inputRef })}
+        required={false}
         autoComplete={'off'}
         value={inputValue}
         onChange={e => {
@@ -65,52 +81,61 @@ const MultipleSelect = ({
               target.id &&
               (target.id.includes(menuId) || target.id.includes(chipId))
             ) {
-              if (inputEl.current) {
-                inputEl.current.focus();
+              if (inputRef.current) {
+                inputRef.current.focus();
               }
             } else {
               setOpen(false);
-              onBlur(e);
+              handleBlur(selectedItems, e);
             }
           }, 1);
         }}
         InputProps={{
           ...InputProps,
-          startAdornment: value.map(itemValue => (
+          classes: inputBaseClasses,
+          startAdornment: selectedItems.map(item => (
             <Chip
-              key={itemValue}
-              id={`${chipId}${itemValue}`}
+              key={itemToValue(item)}
+              id={`${chipId}${itemToValue(item)}`}
+              {...chipProps}
               classes={chipClasses}
-              label={getLabel(itemValue)}
-              onDelete={() => onChange(without(value, itemValue))}
+              label={itemToLabel(item)}
+              onDelete={e => {
+                e.stopPropagation();
+                removeItem(item);
+              }}
             />
           )),
-          classes: inputBaseClasses,
         }}
         // eslint-disable-next-line react/jsx-no-duplicate-props
         inputProps={{
           ...inputProps,
-          onKeyDown: handleKeyDown,
+          onKeyDown: handleKeyDown(inputValue),
         }}
       />
       {open && (
         <OptionMenu
-          selectedItems={value}
-          options={options}
-          selectedItemExcluded={selectedItemExcluded}
-          filterOption={optionValue => filterOption(inputValue, optionValue)}
-          renderEmpty={renderEmpty}
-          menuId={menuId}
-          onClickItem={(_, val) => {
-            if (!value.includes(val)) {
-              setInputValue('');
-            }
-            onChange(
-              value.includes(val)
-                ? without(value, val) // remove this item from value
-                : [...value, val], // add selected item to value
-            );
-          }}
+          {...injectMenuProps(
+            {
+              ...props,
+              menuId,
+              inputValue,
+              options,
+              selectedItems,
+              getSelectOptions: getMultiSelectOptions,
+            },
+            {
+              getItemProps: ({ item }) => ({
+                selected: selectedItems.includes(item),
+                onClick: () => {
+                  if (!selectedItems.includes(item)) {
+                    setInputValue('');
+                  }
+                  handleSelection(item);
+                },
+              }),
+            },
+          )}
         />
       )}
     </div>
@@ -127,8 +152,10 @@ MultipleSelect.defaultProps = {
   onBlur: () => {},
   onChange: () => {},
   onChangeInput: () => {},
-  filterOption: (inputValue, optionValue) =>
-    !inputValue || optionValue.toLowerCase().includes(inputValue.toLowerCase()),
+  selectedItemExcluded: false,
+  filterOption: filterByInputValue,
+  itemToLabel: defaultItemToLabel,
+  itemToValue: defaultItemToValue,
 };
 
 export default MultipleSelect;

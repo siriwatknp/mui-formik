@@ -7,77 +7,46 @@ import { boolean, select, text } from '@storybook/addon-knobs';
 
 import matchSorter from 'match-sorter';
 import Box from '@material-ui/core/Box';
-import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Close from '@material-ui/icons/Close';
 import Option from '../src/Option';
 import MultipleSelect from '../src/MultipleSelect';
-import OptionMenu from '../src/MultipleSelect/OptionMenu';
-import MuiDownshift from '../src/MuiDownshift';
+import OptionMenu from '../src/OptionMenu/OptionMenu';
+import DownshiftSelect from '../src/DownshiftSelect';
+import DownshiftMultiSelect from '../src/DownshiftMultiSelect';
+
+import { filterByInputValue } from '../src/utils/functions';
+import { OPTIONS, COUNTRIES, HEROES } from './mock/options';
+import { useAntChipStyles } from '../src/styles/ChipStyles';
+import { useAntInputBaseStyles } from '../src/styles/InputBaseStyles';
 
 const StateProvider = ({ initialState, children }) => {
   const [state, setState] = useState(initialState);
   return children([state, setState]);
 };
 
-const OPTIONS = [
-  { label: 'Option1', value: 1 },
-  { label: 'Option2', value: 2 },
-  { label: 'Option3', value: 3 },
-  { label: 'Option4', value: 4 },
-  { label: 'Option5', value: 5 },
-  { label: 'Option6', value: 6 },
-  { label: 'Option7', value: 7 },
-  { label: 'Option8', value: 8 },
-  { label: 'Option9', value: 9 },
-  { label: 'Option10', value: 10 },
-];
+const log = string => (...args) => console.log(string, ...args);
 
-const SUGGESTIONS = [
-  { label: 'Afghanistan' },
-  { label: 'Aland Islands' },
-  { label: 'Albania' },
-  { label: 'Algeria' },
-  { label: 'American Samoa' },
-  { label: 'Andorra' },
-  { label: 'Angola' },
-  { label: 'Anguilla' },
-  { label: 'Antarctica' },
-  { label: 'Antigua and Barbuda' },
-  { label: 'Argentina' },
-  { label: 'Armenia' },
-  { label: 'Aruba' },
-  { label: 'Australia' },
-  { label: 'Austria' },
-  { label: 'Azerbaijan' },
-  { label: 'Bahamas' },
-  { label: 'Bahrain' },
-  { label: 'Bangladesh' },
-  { label: 'Barbados' },
-  { label: 'Belarus' },
-  { label: 'Belgium' },
-  { label: 'Belize' },
-  { label: 'Benin' },
-  { label: 'Bermuda' },
-  { label: 'Bhutan' },
-  { label: 'Bolivia, Plurinational State of' },
-  { label: 'Bonaire, Sint Eustatius and Saba' },
-  { label: 'Bosnia and Herzegovina' },
-  { label: 'Botswana' },
-  { label: 'Bouvet Island' },
-  { label: 'Brazil' },
-  { label: 'British Indian Ocean Territory' },
-  { label: 'Brunei Darussalam' },
-].map(({ label }) => ({
-  label,
-  value: label.toLowerCase(),
-}));
+const AntMultipleSelect = props => {
+  const antChipClasses = useAntChipStyles();
+  const antInputBaseClasses = useAntInputBaseStyles();
+  return (
+    <MultipleSelect
+      {...props}
+      label={''}
+      chipClasses={antChipClasses}
+      chipProps={{ deleteIcon: <Close /> }}
+      inputBaseClasses={antInputBaseClasses}
+    />
+  );
+};
 
-function getItems(filter) {
-  return filter
-    ? matchSorter(SUGGESTIONS, filter, {
+const getOptions = (items, inputValue) =>
+  inputValue
+    ? matchSorter(items, inputValue, {
         keys: ['label'],
       })
-    : SUGGESTIONS;
-}
+    : items;
 
 storiesOf('Components', module)
   .add('Single Option', () => (
@@ -92,56 +61,117 @@ storiesOf('Components', module)
   .add('Option Menu', () => (
     <OptionMenu options={OPTIONS} selectedItems={[1, 3]} />
   ))
-  .add('Multiple Select', () => (
-    <StateProvider initialState={[]}>
-      {([value, onChange]) => {
-        return (
-          <Box m={2} width={300}>
-            <MultipleSelect
-              label={'Select'}
-              placeholder={'type option'}
-              fullWidth
-              options={OPTIONS}
-              value={value}
-              onChange={onChange}
-            />
-          </Box>
-        );
-      }}
-    </StateProvider>
-  ))
+  .add('Multiple Select', () => {
+    const matchSorter = boolean('Use match sorter to get options', true);
+    const filterOption = boolean('Use filter by input value', false);
+    const selectedItemExcluded = boolean('Exclude selected item', true);
+    const maxOutput = select('Max option output', [false, 5, 10, 25], false);
+    const variant = select(
+      'variant',
+      ['standard', 'outlined', 'filled'],
+      'outlined',
+    );
+    return (
+      <StateProvider initialState={[]}>
+        {([value, onChange]) => {
+          const props = {
+            options: OPTIONS,
+            fullWidth: true,
+            label: 'Select',
+            placeholder: 'Type option',
+            value,
+            onChange,
+            onBlur: onChange,
+            variant,
+            selectedItemExcluded,
+            maxOptionOutput: maxOutput,
+            filterOption: filterOption ? filterByInputValue : false,
+            getOptions: matchSorter ? getOptions : false,
+          };
+          return (
+            <Box m={2} maxWidth={500}>
+              <Typography variant={'subtitle2'}>
+                Mui Formik
+              </Typography>
+              <br />
+              <MultipleSelect {...props} />
+              <br />
+              <br />
+              <Typography gutterBottom variant={'subtitle2'}>
+                Ant Design
+              </Typography>
+
+              <AntMultipleSelect {...props} />
+            </Box>
+          );
+        }}
+      </StateProvider>
+    );
+  })
   .add('MuiDownshift', () => {
     const label = text('label', 'Label');
     const placeholder = text('placeholder', 'Type here');
     const fullOptionReturned = boolean('Full option returned', false);
-    const maxOutput = select('Max option output', [false, 5, 10, 25], false);
-    const optionHidden = boolean('Option hidden after clicked', false);
-    const filterOption = boolean('Use match sorter as filterOption', false);
-    const matchSorter = boolean('Use match sorter to get options', false);
-    const variants = ['standard', 'outlined', 'filled'];
+    const matchSorter = boolean('Use match sorter to get options', true);
+    const filterOption = boolean('Use filter by input value', false);
+    const selectedItemExcluded = boolean('Exclude selected item', true);
+    const maxOutput = select('Max option output', [false, 5, 10, 25]);
+    const menuClosed = boolean('Menu closed after clicked', true);
+    const variant = select(
+      'variant',
+      ['standard', 'outlined', 'filled'],
+      'outlined',
+    );
     return (
-      <Box p={3}>
-        <Grid container spacing={3}>
-          {variants.map(v => (
-            <Grid item key={v}>
-              <MuiDownshift
-                label={label}
-                placeholder={placeholder}
-                variant={v}
-                options={SUGGESTIONS}
-                onChange={console.log}
-                onBlur={console.log}
-                fullOptionReturned={fullOptionReturned}
-                maxOptionOutput={maxOutput}
-                optionHiddenAfterClicked={optionHidden}
-                filterOption={
-                  filterOption ? MuiDownshift.utils.filterByInputValue : false
-                }
-                getOptions={matchSorter ? getItems : false}
-              />
-            </Grid>
-          ))}
-        </Grid>
+      <Box p={3} maxWidth={400}>
+        <DownshiftSelect
+          label={label}
+          placeholder={placeholder}
+          variant={variant}
+          options={COUNTRIES}
+          onChange={log('changed')}
+          onBlur={log('blurred')}
+          selectedItemExcluded={selectedItemExcluded}
+          fullOptionReturned={fullOptionReturned}
+          maxOptionOutput={maxOutput}
+          menuClosedAfterClicked={menuClosed}
+          filterOption={filterOption ? filterByInputValue : false}
+          getOptions={matchSorter ? getOptions : false}
+        />
+      </Box>
+    );
+  })
+  .add('Downshift MultiSelect', () => {
+    const label = text('label', 'Label');
+    const placeholder = text('placeholder', 'Type here');
+    const fullOptionReturned = boolean('Full option returned', false);
+    const matchSorter = boolean('Use match sorter to get options', true);
+    const filterOption = boolean('Use filter by input value', false);
+    const selectedItemExcluded = boolean('Exclude selected item', true);
+    const maxOutput = select('Max option output', [false, 5, 10, 25]);
+    const variant = select(
+      'variant',
+      ['standard', 'outlined', 'filled'],
+      'outlined',
+    );
+    return (
+      <Box p={3} maxWidth={400}>
+        <DownshiftMultiSelect
+          label={label}
+          placeholder={placeholder}
+          variant={variant}
+          fullWidth
+          options={HEROES}
+          itemToValue={item => (item ? item.id : '')}
+          itemToLabel={item => (item ? item.name : '')}
+          onChange={log('changed')}
+          onBlur={log('blurred')}
+          selectedItemExcluded={selectedItemExcluded}
+          fullOptionReturned={fullOptionReturned}
+          maxOptionOutput={maxOutput}
+          filterOption={filterOption ? filterByInputValue : false}
+          getOptions={matchSorter ? getOptions : false}
+        />
       </Box>
     );
   });

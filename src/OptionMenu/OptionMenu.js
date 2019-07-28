@@ -1,32 +1,23 @@
 import React from 'react';
 import Box from '@material-ui/core/Box';
 import Paper from '@material-ui/core/Paper';
-import MenuItem from '@material-ui/core/MenuItem';
 import InboxTwoTone from '@material-ui/icons/InboxTwoTone';
 import Typography from '@material-ui/core/Typography';
-import {
-  useContainerStyles,
-  useOptionStyles,
-} from '../styles/useMultiSelectStyles';
+import Option from '../Option';
+import { useContainerStyles } from '../styles/useMultiSelectStyles';
 
 const OptionMenu = ({
   options,
   menuId,
-  selectedItemExcluded,
-  filterOption,
-  selectedItems,
+  itemToValue,
   onClickItem,
   paperProps,
   renderEmpty,
+  getMenuProps,
+  getItemProps,
   ...props
 }) => {
   const containerClasses = useContainerStyles(props);
-  const optionClasses = useOptionStyles();
-  const shouldRenderOption = value => {
-    if (typeof filterOption === 'function') return filterOption(value);
-    if (selectedItemExcluded) return !selectedItems.includes(value);
-    return true;
-  };
   const empty = () => {
     if (renderEmpty === false) return null;
     if (typeof renderEmpty === 'function') return renderEmpty();
@@ -49,21 +40,15 @@ const OptionMenu = ({
     );
   };
   return (
-    <Paper classes={containerClasses}>
-      {options.map(({ label, value }) =>
-        shouldRenderOption(value) ? (
-          <MenuItem
-            id={`${menuId}${value}`}
-            key={value}
-            classes={optionClasses}
-            selected={selectedItems.includes(value)}
-            onClick={e => onClickItem(e, value)}
-          >
-            {label}
-          </MenuItem>
-        ) : null,
-      )}
-      {options.length === selectedItems.length && empty()}
+    <Paper classes={containerClasses} {...getMenuProps()}>
+      {options.map((item, index) => (
+        <Option
+          id={`${menuId}${itemToValue(item)}`}
+          key={itemToValue(item)}
+          {...getItemProps({ item, index })}
+        />
+      ))}
+      {options.length === 0 && empty()}
     </Paper>
   );
 };
@@ -72,11 +57,10 @@ OptionMenu.propTypes = {};
 OptionMenu.defaultProps = {
   options: [],
   menuId: '__menu__',
-  selectedItems: [],
+  itemToValue: item => (item ? item.value : ''),
   onClickItem: () => {},
-  filterOption: undefined,
+  getMenuProps: () => ({}),
   renderEmpty: undefined,
-  selectedItemExcluded: false,
 };
 
 export default OptionMenu;

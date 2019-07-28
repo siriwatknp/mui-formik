@@ -9,6 +9,10 @@ import Form from './forms/Form';
 import TextField from '../src/TextField';
 import CheckField from '../src/CheckField';
 import MultiSelectField from '../src/MultiSelectField';
+import DsSelectField from '../src/DsSelectField';
+import DsMultiSelectField from '../src/DsMultiSelectField';
+
+import { COUNTRIES, NAMES } from './mock/options';
 
 const createSchema = shape => Yup.object().shape(shape);
 
@@ -70,16 +74,55 @@ storiesOf('Mui Formik', module)
           placeholder={"Type your friend's name"}
           name={'friends'}
           selectedItemExcluded={boolean('Selected item excluded', false)}
-          options={[
-            { label: 'Jun', value: 'jun' },
-            { label: 'Mike', value: 'mike' },
-            { label: 'Tony', value: 'tony' },
-            { label: 'Strange', value: 'strange' },
-            { label: 'Thor', value: 'thor' },
-            { label: 'Steven', value: 'steven' },
-            { label: 'Justin', value: 'justin' },
-          ]}
+          options={NAMES}
         />
       )}
+    </Form>
+  ))
+  .add('Downshift Select Field', () => (
+    <Form
+      title={'Your home town'}
+      initialValues={{ country: '' }}
+      validationSchema={createSchema({
+        country: Yup.string().required('Country is required.'),
+      })}
+      onSubmit={values => console.log('values', values)}
+    >
+      {() => {
+        return (
+          <DsSelectField
+            {...MultiSelectField.baseProps}
+            label={'Country'}
+            name={'country'}
+            placeholder={'Type a country'}
+            options={COUNTRIES}
+          />
+        );
+      }}
+    </Form>
+  ))
+  .add('Downshift MultiSelect Field', () => (
+    <Form
+      title={'Best friends'}
+      initialValues={{ friends: [] }}
+      validationSchema={createSchema({
+        friends: Yup.array()
+          .of(Yup.string())
+          .required('You must have friends')
+          .min(3, 'Minimum of 3 friends'),
+      })}
+      onSubmit={values => console.log('values', values)}
+    >
+      {() => {
+        return (
+          <DsMultiSelectField
+            {...DsMultiSelectField.baseProps}
+            label={'Friends'}
+            name={'friends'}
+            placeholder={'Type a name'}
+            options={NAMES}
+          />
+        );
+      }}
     </Form>
   ));
