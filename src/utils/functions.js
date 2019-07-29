@@ -107,18 +107,26 @@ const reduceFunctions = (...funcs) => {
 export const filterSelectedItems = (selectedItems, shouldFilter) => items =>
   shouldFilter ? items.filter(item => !selectedItems.includes(item)) : items;
 
-export const filterSelectedItem = (selectedItem, shouldFilter) => items =>
+export const filterSelectedItem = (
+  selectedItem,
+  shouldFilter = true,
+  itemToValue = arg => arg,
+) => items =>
   shouldFilter && selectedItem
     ? items.filter(item =>
         typeof selectedItem === 'string'
           ? selectedItem
-          : selectedItem.value !== item.value,
+          : itemToValue(selectedItem) !== itemToValue(item),
       )
     : items;
 
-export const filterBy = (filterOption, inputValue) => items => {
+export const filterBy = (
+  filterOption,
+  inputValue = '',
+  itemToValue = arg => arg,
+) => items => {
   if (!isValidFunction(filterOption)) return items;
-  return items.filter(item => filterOption(inputValue, item.value));
+  return items.filter(item => filterOption(inputValue, itemToValue(item)));
 };
 
 export const getSelectOptions = (
@@ -130,12 +138,13 @@ export const getSelectOptions = (
     inputValue,
     selectedItemExcluded,
     selectedItem,
+    itemToValue,
   },
 ) => {
   return reduceFunctions(
     getMaxItems(maxOptionOutput),
-    filterSelectedItem(selectedItem, selectedItemExcluded),
-    filterBy(filterOption, inputValue),
+    filterSelectedItem(selectedItem, selectedItemExcluded, itemToValue),
+    filterBy(filterOption, inputValue, itemToValue),
     isValidFunction(getOptions)
       ? items => getOptions(items, inputValue)
       : arg => arg,
@@ -151,12 +160,13 @@ export const getMultiSelectOptions = (
     getOptions,
     inputValue,
     selectedItems,
+    itemToValue,
   },
 ) => {
   return reduceFunctions(
     getMaxItems(maxOptionOutput),
     filterSelectedItems(selectedItems, selectedItemExcluded),
-    filterBy(filterOption, inputValue),
+    filterBy(filterOption, inputValue, itemToValue),
     isValidFunction(getOptions)
       ? items => getOptions(items, inputValue)
       : arg => arg,

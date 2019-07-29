@@ -1,8 +1,9 @@
 import Color from 'color';
 import { makeStyles } from '@material-ui/styles';
 
-export const useAntInputBaseStyles = makeStyles(({ palette }) => ({
-  root: {
+export const antInputBaseStyles = ({ palette }) => ({
+  field: {
+    flexWrap: 'wrap',
     padding: '4px 8px',
     '&:hover $notchedOutline': {
       borderColor: palette.primary.main,
@@ -17,7 +18,7 @@ export const useAntInputBaseStyles = makeStyles(({ palette }) => ({
       margin: '2px 8px 2px 0',
     },
   },
-  input: {
+  fieldInput: {
     padding: '2.5px 2px',
     fontSize: 14,
     height: 'auto',
@@ -25,6 +26,10 @@ export const useAntInputBaseStyles = makeStyles(({ palette }) => ({
     width: 'auto',
     flexGrow: 1,
   },
-  notchedOutline: {},
+  notchedOutline: {
+    borderColor: '#d9d9d9',
+  },
   focused: {},
-}));
+});
+
+export const useAntInputBaseStyles = makeStyles(antInputBaseStyles);

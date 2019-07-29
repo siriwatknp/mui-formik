@@ -10,7 +10,13 @@ import { withKnobs } from '@storybook/addon-knobs';
 // setConsoleOptions({
 //   panelExclude: [],
 // });
-const baseTheme = createMuiTheme();
+const baseTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#1890ff',
+    },
+  },
+});
 const ThemeDecorator = storyFn => (
   <>
     <CssBaseline />

@@ -4,6 +4,8 @@ export const defaultItemToLabel = item => (item ? item.label : '');
 export const injectMenuProps = (
   {
     menuId,
+    classes,
+    overrides,
     options = [],
     itemToLabel = defaultItemToLabel,
     itemToValue = defaultItemToValue,
@@ -19,9 +21,11 @@ export const injectMenuProps = (
     getSelectOptions = false,
     renderEmpty = undefined, // show default ui
   },
-  overrides = {},
+  extra = {},
 ) => ({
   menuId,
+  classes,
+  overrides,
   getMenuProps,
   options: getSelectOptions(options, {
     maxOptionOutput,
@@ -31,6 +35,7 @@ export const injectMenuProps = (
     selectedItem,
     selectedItems,
     selectedItemExcluded,
+    itemToValue,
   }),
   getItemProps: ({ item, index }) =>
     getItemProps({
@@ -38,7 +43,7 @@ export const injectMenuProps = (
       item,
       index,
       children: itemToLabel(item),
-      ...(overrides.getItemProps && overrides.getItemProps({ item, index })),
+      ...(extra.getItemProps && extra.getItemProps({ item, index })),
     }),
   renderEmpty,
 });

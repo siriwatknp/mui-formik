@@ -8,17 +8,15 @@ import { boolean, select, text } from '@storybook/addon-knobs';
 import matchSorter from 'match-sorter';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
-import Close from '@material-ui/icons/Close';
-import Option from '../src/Option';
-import MultipleSelect from '../src/MultipleSelect';
-import OptionMenu from '../src/OptionMenu/OptionMenu';
-import DownshiftSelect from '../src/DownshiftSelect';
+import OptionDemo from './components/OptionDemo';
+import OptionMenuDemo from './components/OptionMenuDemo';
+import MultiSelectDemo from './components/MultiSelectDemo';
+import DownshiftDemo from './components/DownshiftDemo';
+import MultiDownshiftDemo from './components/MultiDownshiftDemo';
 import DownshiftMultiSelect from '../src/DownshiftMultiSelect';
 
 import { filterByInputValue } from '../src/utils/functions';
 import { OPTIONS, COUNTRIES, HEROES } from './mock/options';
-import { useAntChipStyles } from '../src/styles/ChipStyles';
-import { useAntInputBaseStyles } from '../src/styles/InputBaseStyles';
 
 const StateProvider = ({ initialState, children }) => {
   const [state, setState] = useState(initialState);
@@ -27,39 +25,26 @@ const StateProvider = ({ initialState, children }) => {
 
 const log = string => (...args) => console.log(string, ...args);
 
-const AntMultipleSelect = props => {
-  const antChipClasses = useAntChipStyles();
-  const antInputBaseClasses = useAntInputBaseStyles();
-  return (
-    <MultipleSelect
-      {...props}
-      label={''}
-      chipClasses={antChipClasses}
-      chipProps={{ deleteIcon: <Close /> }}
-      inputBaseClasses={antInputBaseClasses}
-    />
-  );
-};
-
 const getOptions = (items, inputValue) =>
   inputValue
     ? matchSorter(items, inputValue, {
-        keys: ['label'],
+        keys: ['name', 'label'],
       })
     : items;
 
 storiesOf('Components', module)
   .add('Single Option', () => (
-    <Option
+    <OptionDemo
       highlighted={boolean('highlighted', false)}
       selected={boolean('selected', false)}
       hoverless={boolean('hoverless', false)}
-    >
-      Option
-    </Option>
+    />
   ))
   .add('Option Menu', () => (
-    <OptionMenu options={OPTIONS} selectedItems={[1, 3]} />
+    <OptionMenuDemo
+      options={OPTIONS}
+      selectedItems={[OPTIONS[1], OPTIONS[3]]}
+    />
   ))
   .add('Multiple Select', () => {
     const matchSorter = boolean('Use match sorter to get options', true);
@@ -89,26 +74,13 @@ storiesOf('Components', module)
             getOptions: matchSorter ? getOptions : false,
           };
           return (
-            <Box m={2} maxWidth={500}>
-              <Typography variant={'subtitle2'}>
-                Mui Formik
-              </Typography>
-              <br />
-              <MultipleSelect {...props} />
-              <br />
-              <br />
-              <Typography gutterBottom variant={'subtitle2'}>
-                Ant Design
-              </Typography>
-
-              <AntMultipleSelect {...props} />
-            </Box>
+            <MultiSelectDemo {...props} />
           );
         }}
       </StateProvider>
     );
   })
-  .add('MuiDownshift', () => {
+  .add('Downshift', () => {
     const label = text('label', 'Label');
     const placeholder = text('placeholder', 'Type here');
     const fullOptionReturned = boolean('Full option returned', false);
@@ -123,22 +95,20 @@ storiesOf('Components', module)
       'outlined',
     );
     return (
-      <Box p={3} maxWidth={400}>
-        <DownshiftSelect
-          label={label}
-          placeholder={placeholder}
-          variant={variant}
-          options={COUNTRIES}
-          onChange={log('changed')}
-          onBlur={log('blurred')}
-          selectedItemExcluded={selectedItemExcluded}
-          fullOptionReturned={fullOptionReturned}
-          maxOptionOutput={maxOutput}
-          menuClosedAfterClicked={menuClosed}
-          filterOption={filterOption ? filterByInputValue : false}
-          getOptions={matchSorter ? getOptions : false}
-        />
-      </Box>
+      <DownshiftDemo
+        label={label}
+        placeholder={placeholder}
+        variant={variant}
+        options={COUNTRIES}
+        onChange={log('changed')}
+        onBlur={log('blurred')}
+        selectedItemExcluded={selectedItemExcluded}
+        fullOptionReturned={fullOptionReturned}
+        maxOptionOutput={maxOutput}
+        menuClosedAfterClicked={menuClosed}
+        filterOption={filterOption ? filterByInputValue : false}
+        getOptions={matchSorter ? getOptions : false}
+      />
     );
   })
   .add('Downshift MultiSelect', () => {
@@ -155,24 +125,22 @@ storiesOf('Components', module)
       'outlined',
     );
     return (
-      <Box p={3} maxWidth={400}>
-        <DownshiftMultiSelect
-          label={label}
-          placeholder={placeholder}
-          variant={variant}
-          fullWidth
-          options={HEROES}
-          itemToValue={item => (item ? item.id : '')}
-          itemToLabel={item => (item ? item.name : '')}
-          onChange={log('changed')}
-          onBlur={log('blurred')}
-          selectedItemExcluded={selectedItemExcluded}
-          fullOptionReturned={fullOptionReturned}
-          maxOptionOutput={maxOutput}
-          filterOption={filterOption ? filterByInputValue : false}
-          getOptions={matchSorter ? getOptions : false}
-        />
-      </Box>
+      <MultiDownshiftDemo
+        label={label}
+        placeholder={placeholder}
+        variant={variant}
+        fullWidth
+        options={HEROES}
+        itemToValue={item => (item ? item.id : '')}
+        itemToLabel={item => (item ? item.name : '')}
+        onChange={log('changed')}
+        onBlur={log('blurred')}
+        selectedItemExcluded={selectedItemExcluded}
+        fullOptionReturned={fullOptionReturned}
+        maxOptionOutput={maxOutput}
+        filterOption={filterOption ? filterByInputValue : false}
+        getOptions={matchSorter ? getOptions : false}
+      />
     );
   });
 

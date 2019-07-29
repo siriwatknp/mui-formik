@@ -49,32 +49,6 @@ export const useRootStyles = makeStyles(() => ({
   }),
 }));
 
-export const useOptionStyles = makeStyles(({ palette }) => ({
-  root: ({ highlighted, hoverless }) => ({
-    '&:hover': {
-      ...(hoverless && {
-        backgroundColor: 'transparent',
-      }),
-    },
-    ...(highlighted && {
-      backgroundColor: palette.divider,
-      '&:hover': {
-        backgroundColor: palette.divider,
-      },
-    }),
-  }),
-
-  selected: {
-    '&$root': {
-      backgroundColor: palette.primary.main,
-      color: palette.common.white,
-      '&:hover': {
-        backgroundColor: palette.primary.light,
-      },
-    },
-  },
-}));
-
 export const useToggleStyles = makeStyles(() => ({
   root: {
     position: 'absolute',

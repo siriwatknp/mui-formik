@@ -1,17 +1,13 @@
 import React, { useRef, useState } from 'react';
+import cx from 'clsx';
 import Downshift from 'downshift';
+import { withStyles } from '@material-ui/styles';
 import Chip from '@material-ui/core/Chip';
 import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowDown from '@material-ui/icons/KeyboardArrowDownRounded';
 import ArrowUp from '@material-ui/icons/KeyboardArrowUpRounded';
 import OptionMenu from '../OptionMenu';
-import {
-  useRootStyles,
-  useChipStyles,
-  useMultiSelectInputBaseStyles,
-  useToggleStyles,
-} from '../styles/useMultiSelectStyles';
 import { filterByInputValue, getMultiSelectOptions } from '../utils/functions';
 import { createStateReducer } from '../logics/downshift';
 import {
@@ -23,18 +19,58 @@ import {
 } from '../logics/select';
 import Collection from '../utils/collection';
 
+const styles = ({ spacing }) => ({
+  // Root CSS
+  container: {
+    position: 'relative',
+    display: 'inline-block',
+  },
+  containerFullWidth: {
+    display: 'block',
+  },
+  // TextField CSS
+  field: {
+    flexWrap: 'wrap',
+    padding: '12px 0 8px 12px',
+    paddingRight: spacing(6.5),
+  },
+  fieldInput: {
+    padding: '8px 8px 9px 4px',
+    width: 'auto',
+    flexGrow: 1,
+  },
+  chipRoot: {
+    marginRight: spacing(1),
+    marginBottom: spacing(0.5),
+  },
+  // Toggle & Clear Btn
+  iconBtn: {
+    position: 'absolute',
+    top: '50%',
+    right: 4,
+    transform: 'translateY(-50%)',
+  },
+  iconBtnLabel: {},
+  // Toggle Btn
+  toggleBtn: {},
+  // Clear Btn
+  clearBtn: {},
+  // the rest is OptionMenu CSS API
+});
+
 const DownshiftMultiSelect = props => {
   const {
+    fullWidth,
+    chipProps,
+    classes,
+    overrides,
     itemToValue,
     itemToLabel,
     fullOptionReturned,
     onChange: onChangeDS,
     onBlur: onBlurDS,
   } = props;
-  const rootClasses = useRootStyles(props);
-  const chipClasses = useChipStyles();
-  const inputBaseClasses = useMultiSelectInputBaseStyles();
-  const toggleClasses = useToggleStyles();
+  const css = overrides || classes;
   const inputRef = useRef(null);
   const [selectedItems, setSelectedItems] = useState([]);
   const returnValue = cb => (items, ...args) => {
@@ -68,9 +104,6 @@ const DownshiftMultiSelect = props => {
           highlightedIndex,
         } = downshift;
         const { value, onChange, onBlur, ...inputProps } = getInputProps({
-          onClick: () => {
-            openMenu();
-          },
           onKeyDown: handleKeyDown(inputValue),
           onBlur: () => handleBlur(selectedItems),
         });
@@ -83,7 +116,9 @@ const DownshiftMultiSelect = props => {
           },
         });
         return (
-          <div className={rootClasses.root}>
+          <div
+            className={cx(css.container, fullWidth && css.containerFullWidth)}
+          >
             <TextField
               {...injectTextFieldProps({
                 ...props,
@@ -94,14 +129,30 @@ const DownshiftMultiSelect = props => {
                 onChange,
                 onBlur,
               })}
+              onClick={() => {
+                openMenu();
+              }}
               required={false}
               InputProps={{
-                classes: inputBaseClasses,
+                classes: {
+                  ...css,
+                  root: css.field,
+                  input: css.fieldInput,
+                },
                 startAdornment: selectedItems.map(item => {
                   return (
                     <Chip
                       key={itemToValue(item)}
-                      classes={chipClasses}
+                      {...chipProps}
+                      onClick={() => {
+                        openMenu();
+                      }}
+                      classes={{
+                        root: css.chipRoot,
+                        label: css.chipLabel,
+                        deleteIcon: css.chipDeleteIcon,
+                        deletable: css.chipDeletable,
+                      }}
                       label={itemToLabel(item)}
                       onDelete={e => {
                         e.stopPropagation();
@@ -111,7 +162,13 @@ const DownshiftMultiSelect = props => {
                   );
                 }),
                 endAdornment: (
-                  <IconButton {...toggleBtnProps} classes={toggleClasses}>
+                  <IconButton
+                    {...toggleBtnProps}
+                    classes={{
+                      root: cx(css.iconBtn, css.toggleBtn),
+                      label: css.iconBtnLabel,
+                    }}
+                  >
                     {isOpen ? <ArrowUp /> : <ArrowDown />}
                   </IconButton>
                 ),
@@ -158,4 +215,6 @@ DownshiftMultiSelect.defaultProps = {
   onBlur: () => {},
 };
 
-export default DownshiftMultiSelect;
+export default withStyles(styles, { name: 'MultiDownshift' })(
+  DownshiftMultiSelect,
+);

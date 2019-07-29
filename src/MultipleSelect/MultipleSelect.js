@@ -1,12 +1,9 @@
 import React, { useState, useRef } from 'react';
+import cx from 'clsx';
+import { withStyles } from '@material-ui/styles';
 import TextField from '@material-ui/core/TextField';
 import Chip from '@material-ui/core/Chip';
 import OptionMenu from '../OptionMenu';
-import {
-  useChipStyles,
-  useMultiSelectInputBaseStyles,
-  useRootStyles,
-} from '../styles/useMultiSelectStyles';
 import { filterByInputValue, getMultiSelectOptions } from '../utils/functions';
 import {
   injectMenuProps,
@@ -17,11 +14,39 @@ import {
 } from '../logics/select';
 import Collection from '../utils/collection';
 
+const styles = ({ spacing }) => ({
+  container: {
+    position: 'relative',
+    display: 'inline-block',
+  },
+  containerFullWidth: {
+    display: 'block',
+  },
+  field: {
+    flexWrap: 'wrap',
+    padding: '12px 0 8px 12px',
+  },
+  fieldInput: {
+    padding: '8px 8px 9px 4px',
+    width: 'auto',
+    flexGrow: 1,
+  },
+  chipRoot: {
+    marginRight: spacing(1),
+    marginBottom: spacing(0.5),
+  },
+  // chipLabel: {},
+  // chipDeletable: {},
+  // chipDeleteIcon: {},
+  // the rest is OptionMenu CSS API
+});
+
 const MultipleSelect = props => {
   const {
     options,
     menuId,
     chipId,
+    fullWidth,
     onChangeInput,
     onChange,
     onFocus,
@@ -30,17 +55,20 @@ const MultipleSelect = props => {
     inputProps,
     itemToLabel,
     itemToValue,
-    fullOptionReturned,
-    rootClasses: extRootClasses,
-    chipClasses: extChipClasses,
     chipProps,
-    inputBaseClasses: extInputBaseClasses,
+    fullOptionReturned,
+    classes,
+    overrides,
+    // rootClasses: extRootClasses,
+    // chipClasses: extChipClasses,
+    // inputBaseClasses: extInputBaseClasses,
   } = props;
-  const rootClasses = useRootStyles({ ...props, classes: extRootClasses });
-  const chipClasses = useChipStyles({ classes: extChipClasses });
-  const inputBaseClasses = useMultiSelectInputBaseStyles({
-    classes: extInputBaseClasses,
-  });
+  // const rootClasses = useRootStyles({ ...props, classes: extRootClasses });
+  // const chipClasses = useChipStyles({ classes: extChipClasses });
+  // const inputBaseClasses = useMultiSelectInputBaseStyles({
+  //   classes: extInputBaseClasses,
+  // });
+  const css = overrides || classes;
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
   const [selectedItems, setSelectedItems] = useState([]);
@@ -59,7 +87,7 @@ const MultipleSelect = props => {
     stateUpdater,
   );
   return (
-    <div className={rootClasses.root}>
+    <div className={cx(css.container, fullWidth && css.containerFullWidth)}>
       <TextField
         {...injectTextFieldProps({ ...props, inputRef })}
         required={false}
@@ -92,13 +120,22 @@ const MultipleSelect = props => {
         }}
         InputProps={{
           ...InputProps,
-          classes: inputBaseClasses,
+          classes: {
+            ...css,
+            root: css.field,
+            input: css.fieldInput,
+          },
           startAdornment: selectedItems.map(item => (
             <Chip
               key={itemToValue(item)}
               id={`${chipId}${itemToValue(item)}`}
               {...chipProps}
-              classes={chipClasses}
+              classes={{
+                root: css.chipRoot,
+                label: css.chipLabel,
+                deleteIcon: css.chipDeleteIcon,
+                deletable: css.chipDeletable,
+              }}
               label={itemToLabel(item)}
               onDelete={e => {
                 e.stopPropagation();
@@ -158,4 +195,4 @@ MultipleSelect.defaultProps = {
   itemToValue: defaultItemToValue,
 };
 
-export default MultipleSelect;
+export default withStyles(styles, { name: 'MultiSelect' })(MultipleSelect);

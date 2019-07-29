@@ -1,16 +1,13 @@
 import React, { useRef } from 'react';
+import cx from 'clsx';
 import Downshift from 'downshift';
+import { withStyles } from '@material-ui/styles';
 import TextField from '@material-ui/core/TextField';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowDown from '@material-ui/icons/KeyboardArrowDownRounded';
 import ArrowUp from '@material-ui/icons/KeyboardArrowUpRounded';
 import Backspace from '@material-ui/icons/Backspace';
 import OptionMenu from '../OptionMenu';
-import {
-  useRootStyles,
-  useSelectInputBaseStyles,
-} from '../styles/useMultiSelectStyles';
 import { filterByInputValue, getSelectOptions } from '../utils/functions';
 import { createStateReducer } from '../logics/downshift';
 import {
@@ -20,16 +17,42 @@ import {
   injectTextFieldProps,
 } from '../logics/select';
 
+const styles = ({ spacing }) => ({
+  // Root CSS
+  container: {
+    position: 'relative',
+    display: 'inline-block',
+  },
+  containerFullWidth: {
+    display: 'block',
+  },
+  // TextField CSS
+  field: {
+    paddingRight: spacing(0.5),
+  },
+  fieldInput: {},
+  // Toggle & Clear Btn
+  iconBtn: {},
+  iconBtnLabel: {},
+  // Toggle Btn
+  toggleBtn: {},
+  // Clear Btn
+  clearBtn: {},
+  // the rest is OptionMenu CSS API
+});
+
 const DownshiftSelect = props => {
   const {
+    fullWidth,
+    classes,
+    overrides,
     itemToValue,
     menuClosedAfterClicked,
     fullOptionReturned,
     onChange: onChangeDS,
     onBlur: onBlurDS,
   } = props;
-  const rootClasses = useRootStyles(props);
-  const inputBaseClasses = useSelectInputBaseStyles();
+  const css = overrides || classes;
   const inputRef = useRef(null);
   const returnValue = cb => (option, ...args) => {
     return fullOptionReturned
@@ -85,7 +108,9 @@ const DownshiftSelect = props => {
           }
         };
         return (
-          <div className={rootClasses.root}>
+          <div
+            className={cx(css.container, fullWidth && css.containerFullWidth)}
+          >
             <TextField
               {...injectTextFieldProps({
                 ...props,
@@ -97,19 +122,37 @@ const DownshiftSelect = props => {
                 onChange,
               })}
               InputProps={{
-                classes: inputBaseClasses,
+                classes: {
+                  ...css,
+                  root: css.field,
+                  input: css.fieldInput,
+                },
                 endAdornment: (
-                  <InputAdornment position="end">
+                  <>
                     {selectedItem ? (
-                      <IconButton onClick={handleClear}>
+                      <IconButton
+                        classes={{
+                          root: cx(css.iconBtn, css.clearBtn),
+                          label: css.iconBtnLabel,
+                        }}
+                        onClick={handleClear}
+                        disableRipple
+                      >
                         <Backspace />
                       </IconButton>
                     ) : (
-                      <IconButton {...toggleBtnProps}>
+                      <IconButton
+                        classes={{
+                          root: cx(css.iconBtn, css.toggleBtn),
+                          label: css.iconBtnLabel,
+                        }}
+                        disableRipple
+                        {...toggleBtnProps}
+                      >
                         {isOpen ? <ArrowUp /> : <ArrowDown />}
                       </IconButton>
                     )}
-                  </InputAdornment>
+                  </>
                 ),
               }}
             />
@@ -127,7 +170,6 @@ const DownshiftSelect = props => {
                         selectedItem &&
                         itemToValue(selectedItem) === itemToValue(item),
                       highlighted: highlightedIndex === index,
-                      hoverless: true,
                     }),
                   },
                 )}
@@ -155,4 +197,4 @@ DownshiftSelect.defaultProps = {
   onBlur: () => {},
 };
 
-export default DownshiftSelect;
+export default withStyles(styles, { name: 'Downshift' })(DownshiftSelect);
