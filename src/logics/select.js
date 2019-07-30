@@ -4,8 +4,6 @@ export const defaultItemToLabel = item => (item ? item.label : '');
 export const injectMenuProps = (
   {
     menuId,
-    classes,
-    overrides,
     options = [],
     itemToLabel = defaultItemToLabel,
     itemToValue = defaultItemToValue,
@@ -24,8 +22,6 @@ export const injectMenuProps = (
   extra = {},
 ) => ({
   menuId,
-  classes,
-  overrides,
   getMenuProps,
   options: getSelectOptions(options, {
     maxOptionOutput,

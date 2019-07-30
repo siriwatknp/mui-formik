@@ -47,9 +47,9 @@ storiesOf('Components', module)
     />
   ))
   .add('Multiple Select', () => {
-    const matchSorter = boolean('Use match sorter to get options', true);
-    const filterOption = boolean('Use filter by input value', false);
-    const selectedItemExcluded = boolean('Exclude selected item', true);
+    const matchSorter = boolean('Use match sorter to get options', false);
+    const filterOption = boolean('Use filter by input value', true);
+    const selectedItemExcluded = boolean('Exclude selected item', false);
     const maxOutput = select('Max option output', [false, 5, 10, 25], false);
     const variant = select(
       'variant',
@@ -84,9 +84,9 @@ storiesOf('Components', module)
     const label = text('label', 'Label');
     const placeholder = text('placeholder', 'Type here');
     const fullOptionReturned = boolean('Full option returned', false);
-    const matchSorter = boolean('Use match sorter to get options', true);
-    const filterOption = boolean('Use filter by input value', false);
-    const selectedItemExcluded = boolean('Exclude selected item', true);
+    const matchSorter = boolean('Use match sorter to get options', false);
+    const filterOption = boolean('Use filter by input value', true);
+    const selectedItemExcluded = boolean('Exclude selected item', false);
     const maxOutput = select('Max option output', [false, 5, 10, 25]);
     const menuClosed = boolean('Menu closed after clicked', true);
     const variant = select(
@@ -115,9 +115,9 @@ storiesOf('Components', module)
     const label = text('label', 'Label');
     const placeholder = text('placeholder', 'Type here');
     const fullOptionReturned = boolean('Full option returned', false);
-    const matchSorter = boolean('Use match sorter to get options', true);
-    const filterOption = boolean('Use filter by input value', false);
-    const selectedItemExcluded = boolean('Exclude selected item', true);
+    const matchSorter = boolean('Use match sorter to get options', false);
+    const filterOption = boolean('Use filter by input value', true);
+    const selectedItemExcluded = boolean('Exclude selected item', false);
     const maxOutput = select('Max option output', [false, 5, 10, 25]);
     const variant = select(
       'variant',

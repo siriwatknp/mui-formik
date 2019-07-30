@@ -1,7 +1,7 @@
 import React from 'react';
 import { Field, FastField } from 'formik';
 import { getErrorFromField } from '../utils/functions';
-import MultipleSelect from '../MultipleSelect';
+import MultipleSelect from '../MultiSelect';
 
 const Component = ({ field, form, helperText, ...props }) => {
   const [errorShown, errorText] = getErrorFromField({ field, form });

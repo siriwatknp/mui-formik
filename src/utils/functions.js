@@ -1,4 +1,8 @@
 import { getIn } from 'formik';
+import lodashPick from 'lodash/pick';
+
+export const pick = (object, ...args) =>
+  object ? lodashPick(object, ...args) : object;
 
 export const isPairs = pairs =>
   Array.isArray(pairs) &&
@@ -86,7 +90,11 @@ export const getMaxItems = (max = false) => items => {
 };
 
 export const filterByInputValue = (inputValue = '', optionValue = '') =>
-  !inputValue || optionValue.toLowerCase().includes(inputValue.toLowerCase());
+  !inputValue ||
+  optionValue
+    .toString()
+    .toLowerCase()
+    .includes(inputValue.toLowerCase());
 
 const isValidFunction = fn => typeof fn === 'function';
 

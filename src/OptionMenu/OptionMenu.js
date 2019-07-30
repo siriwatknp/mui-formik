@@ -1,47 +1,28 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/styles';
 import Paper from '@material-ui/core/Paper';
 import InboxTwoTone from '@material-ui/icons/InboxTwoTone';
 import Typography from '@material-ui/core/Typography';
 import Option from '../Option';
-import { defaultItemToLabel } from '../logics/select';
+import styles from './OptionMenu.styles';
+import { defaultItemToLabel, defaultItemToValue } from '../logics/select';
+import { pick } from '../utils/functions';
 
-const styles = ({ palette, spacing }) => ({
-  menuContainer: {
-    position: 'absolute',
-    width: '100%',
-    transform: 'translateY(4px)',
-    maxHeight: 256,
-    overflow: 'auto',
-    zIndex: 5,
-  },
-  emptyRoot: {
-    minHeight: 120,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    color: palette.text.hint,
-  },
-  emptyIcon: {
-    fontSize: 48,
-    color: 'inherit',
-    marginBottom: spacing(1),
-  },
-  emptyText: {},
-});
-
-const OptionMenu = ({
-  options,
-  menuId,
-  selectedItems,
-  itemToValue,
-  renderEmpty,
-  getMenuProps,
-  getItemProps,
-  classes,
-  overrides,
-}) => {
+const OptionMenu = withStyles(styles, { name: 'FmkOptionMenu' })(props => {
+  const {
+    options,
+    menuId,
+    selectedItems,
+    itemToValue,
+    itemToLabel,
+    renderEmpty,
+    PaperProps,
+    getMenuProps,
+    getItemProps,
+    classes,
+    overrides,
+  } = props;
   const { menuContainer, emptyRoot, emptyIcon, emptyText } =
     overrides || classes;
   const empty = () => {
@@ -57,32 +38,75 @@ const OptionMenu = ({
     );
   };
   return (
-    <Paper className={menuContainer} {...getMenuProps()}>
+    <Paper className={menuContainer} {...PaperProps} {...getMenuProps()}>
       {options.map((item, index) => (
         <Option
           id={`${menuId}${itemToValue(item)}`}
           key={itemToValue(item)}
           // eslint-disable-next-line react/no-children-prop
-          children={defaultItemToLabel(item)}
+          children={itemToLabel(item)}
           selected={selectedItems.includes(item)}
-          overrides={overrides}
           {...getItemProps({ item, index })}
+          {...Option.getProps(props)}
         />
       ))}
       {options.length === 0 && empty()}
     </Paper>
   );
-};
+});
 
-OptionMenu.propTypes = {};
+OptionMenu.propTypes = {
+  menuId: PropTypes.string,
+  options: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.shape({}), PropTypes.string]),
+  ),
+  selectedItems: PropTypes.arrayOf(
+    PropTypes.oneOfType([PropTypes.shape({}), PropTypes.string]),
+  ),
+  itemToLabel: PropTypes.func,
+  itemToValue: PropTypes.func,
+  getMenuProps: PropTypes.func,
+  getItemProps: PropTypes.func,
+  renderEmpty: PropTypes.func,
+  classes: PropTypes.shape({}),
+  overrides: PropTypes.shape({}),
+  PaperProps: PropTypes.shape({}),
+};
 OptionMenu.defaultProps = {
   menuId: '__menu__',
   options: [],
   selectedItems: [],
-  itemToValue: item => (item ? item.value : ''),
+  itemToLabel: defaultItemToLabel,
+  itemToValue: defaultItemToValue,
   getMenuProps: () => {},
   getItemProps: () => {},
   renderEmpty: undefined,
+  classes: {},
+  overrides: undefined,
+  PaperProps: undefined,
+};
+OptionMenu.pickClasses = classes => pick(classes, styles.traits);
+OptionMenu.getProps = ({
+  optionMenuClasses,
+  classes,
+  optionMenuOverrides,
+  overrides,
+  PaperProps,
+  ...props
+}) => {
+  const resultClasses = OptionMenu.pickClasses(optionMenuClasses || classes);
+  const resultOverrides = OptionMenu.pickClasses(
+    optionMenuOverrides || overrides,
+  );
+  return {
+    // use this fn when this component render as nested component
+    ...Option.getProps({ classes, overrides, ...props }),
+    classes: resultClasses,
+    overrides: resultOverrides,
+    optionMenuClasses: resultClasses,
+    optionMenuOverrides: resultOverrides,
+    PaperProps,
+  };
 };
 
-export default withStyles(styles, { name: 'FmkOptionMenu' })(OptionMenu);
+export default OptionMenu;

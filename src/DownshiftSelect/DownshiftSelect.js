@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import PropTypes from 'prop-types';
 import cx from 'clsx';
 import Downshift from 'downshift';
 import { withStyles } from '@material-ui/styles';
@@ -7,8 +8,9 @@ import IconButton from '@material-ui/core/IconButton';
 import ArrowDown from '@material-ui/icons/KeyboardArrowDownRounded';
 import ArrowUp from '@material-ui/icons/KeyboardArrowUpRounded';
 import Backspace from '@material-ui/icons/Backspace';
+import styles from './styles';
 import OptionMenu from '../OptionMenu';
-import { filterByInputValue, getSelectOptions } from '../utils/functions';
+import { filterByInputValue, getSelectOptions, pick } from '../utils/functions';
 import { createStateReducer } from '../logics/downshift';
 import {
   defaultItemToLabel,
@@ -17,40 +19,27 @@ import {
   injectTextFieldProps,
 } from '../logics/select';
 
-const styles = ({ spacing }) => ({
-  // Root CSS
-  container: {
-    position: 'relative',
-    display: 'inline-block',
-  },
-  containerFullWidth: {
-    display: 'block',
-  },
-  // TextField CSS
-  field: {
-    paddingRight: spacing(0.5),
-  },
-  fieldInput: {},
-  // Toggle & Clear Btn
-  iconBtn: {},
-  iconBtnLabel: {},
-  // Toggle Btn
-  toggleBtn: {},
-  // Clear Btn
-  clearBtn: {},
-  // the rest is OptionMenu CSS API
-});
-
-const DownshiftSelect = props => {
+const DownshiftSelect = withStyles(styles, { name: 'Downshift' })(props => {
   const {
     fullWidth,
-    classes,
-    overrides,
     itemToValue,
     menuClosedAfterClicked,
     fullOptionReturned,
     onChange: onChangeDS,
     onBlur: onBlurDS,
+    // props for nested components
+    classes,
+    overrides,
+    inputClasses,
+    InputProps,
+    InputLabelProps,
+    FormHelperTextProps,
+    iconButtonClasses,
+    IconButtonProps,
+    svgIconClasses,
+    SvgClearIcon,
+    SvgToggleUpIcon,
+    SvgToggleDownIcon,
   } = props;
   const css = overrides || classes;
   const inputRef = useRef(null);
@@ -121,35 +110,70 @@ const DownshiftSelect = props => {
                 value,
                 onChange,
               })}
+              InputLabelProps={InputLabelProps}
+              FormHelperTextProps={FormHelperTextProps}
               InputProps={{
+                ...InputProps,
                 classes: {
-                  ...css,
-                  root: css.field,
-                  input: css.fieldInput,
+                  ...inputClasses,
+                  root: cx(css.field, inputClasses.root),
+                  input: cx(css.fieldInput, inputClasses.input),
                 },
                 endAdornment: (
                   <>
                     {selectedItem ? (
                       <IconButton
+                        {...IconButtonProps}
                         classes={{
-                          root: cx(css.iconBtn, css.clearBtn),
-                          label: css.iconBtnLabel,
+                          ...iconButtonClasses,
+                          root: cx(
+                            css.iconBtn,
+                            css.clearBtn,
+                            iconButtonClasses.root,
+                          ),
+                          label: cx(css.iconBtnLabel, iconButtonClasses.label),
                         }}
                         onClick={handleClear}
-                        disableRipple
                       >
-                        <Backspace />
+                        <Backspace
+                          classes={{
+                            ...svgIconClasses,
+                            root: cx(css.svgIcon, svgIconClasses.root),
+                          }}
+                          component={SvgClearIcon}
+                        />
                       </IconButton>
                     ) : (
                       <IconButton
+                        {...IconButtonProps}
                         classes={{
-                          root: cx(css.iconBtn, css.toggleBtn),
-                          label: css.iconBtnLabel,
+                          ...iconButtonClasses,
+                          root: cx(
+                            css.iconBtn,
+                            css.toggleBtn,
+                            iconButtonClasses.root,
+                          ),
+                          label: cx(css.iconBtnLabel, iconButtonClasses.label),
                         }}
-                        disableRipple
                         {...toggleBtnProps}
                       >
-                        {isOpen ? <ArrowUp /> : <ArrowDown />}
+                        {isOpen ? (
+                          <ArrowUp
+                            classes={{
+                              ...svgIconClasses,
+                              root: cx(css.svgIcon, svgIconClasses.root),
+                            }}
+                            component={SvgToggleUpIcon}
+                          />
+                        ) : (
+                          <ArrowDown
+                            classes={{
+                              ...svgIconClasses,
+                              root: cx(css.svgIcon, svgIconClasses.root),
+                            }}
+                            component={SvgToggleDownIcon}
+                          />
+                        )}
                       </IconButton>
                     )}
                   </>
@@ -173,6 +197,7 @@ const DownshiftSelect = props => {
                     }),
                   },
                 )}
+                {...OptionMenu.getProps(props)}
               />
             )}
           </div>
@@ -180,21 +205,104 @@ const DownshiftSelect = props => {
       }}
     </Downshift>
   );
-};
+});
 
-DownshiftSelect.propTypes = {};
+DownshiftSelect.propTypes = {
+  options: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({}),
+      PropTypes.string,
+      PropTypes.number,
+    ]),
+  ),
+  onBlur: PropTypes.func,
+  onChange: PropTypes.func,
+  menuClosedAfterClicked: PropTypes.bool,
+  selectedItemExcluded: PropTypes.bool,
+  fullOptionReturned: PropTypes.bool,
+  filterOption: PropTypes.func,
+  itemToLabel: PropTypes.func,
+  itemToValue: PropTypes.func,
+  classes: PropTypes.shape({}),
+  overrides: PropTypes.shape({}),
+  inputClasses: PropTypes.shape({}),
+  InputProps: PropTypes.shape({}),
+  chipClasses: PropTypes.shape({}),
+  ChipProps: PropTypes.shape({}),
+  iconButtonClasses: PropTypes.shape({}),
+  IconButtonProps: PropTypes.shape({}),
+  InputLabelProps: PropTypes.shape({}),
+  FormHelperTextProps: PropTypes.shape({}),
+  svgIconClasses: PropTypes.shape({}),
+  SvgClearIcon: PropTypes.elementType,
+  SvgToggleUpIcon: PropTypes.elementType,
+  SvgToggleDownIcon: PropTypes.elementType,
+};
 DownshiftSelect.defaultProps = {
   options: [],
   maxOptionOutput: 5,
   menuClosedAfterClicked: true,
   getOptions: false,
-  filterOption: filterByInputValue,
   fullOptionReturned: false,
   selectedItemExcluded: true,
+  filterOption: filterByInputValue,
   itemToLabel: defaultItemToLabel,
   itemToValue: defaultItemToValue,
   onChange: () => {},
   onBlur: () => {},
+  classes: {},
+  overrides: undefined,
+  inputClasses: {},
+  InputProps: {},
+  chipClasses: {},
+  ChipProps: {},
+  iconButtonClasses: {},
+  IconButtonProps: {},
+  InputLabelProps: {},
+  FormHelperTextProps: {},
+  svgIconClasses: {},
+  SvgClearIcon: undefined,
+  SvgToggleUpIcon: undefined,
+  SvgToggleDownIcon: undefined,
+};
+DownshiftSelect.pickClasses = classes => pick(classes, styles.traits);
+DownshiftSelect.getProps = ({
+  // use this fn when this component render as nested component
+  downshiftClasses,
+  classes,
+  downshiftOverrides,
+  overrides,
+  inputClasses,
+  InputProps,
+  iconButtonClasses,
+  IconButtonProps,
+  svgIconClasses,
+  SvgClearIcon,
+  SvgToggleUpIcon,
+  SvgToggleDownIcon,
+  ...props
+}) => {
+  const resultClasses = DownshiftSelect.pickClasses(
+    downshiftClasses || classes,
+  );
+  const resultOverrides = DownshiftSelect.pickClasses(
+    downshiftOverrides || overrides,
+  );
+  return {
+    ...OptionMenu.getProps({ classes, overrides, ...props }),
+    inputClasses,
+    InputProps,
+    iconButtonClasses,
+    IconButtonProps,
+    svgIconClasses,
+    SvgClearIcon,
+    SvgToggleUpIcon,
+    SvgToggleDownIcon,
+    classes: resultClasses,
+    overrides: resultOverrides,
+    downshiftClasses: resultClasses,
+    downshiftOverrides: resultOverrides,
+  };
 };
 
-export default withStyles(styles, { name: 'Downshift' })(DownshiftSelect);
+export default DownshiftSelect;

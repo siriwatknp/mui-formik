@@ -1,3 +1,3 @@
 export { default as styles } from './styles';
 
-export { default } from './Option';
+export { default } from './MultiSelect';

@@ -1,19 +1,59 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/styles';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
+import ClearRounded from '@material-ui/icons/ClearRounded';
 import Demo from './Demo';
 import DownshiftSelect from '../../src/DownshiftSelect';
 import { useAntSelectStyles } from '../../src/styles/SelectStyles';
 
+const useCustomStyles = makeStyles(({ spacing, palette }) => ({
+  field: {
+    padding: 0,
+    paddingBottom: 4,
+  },
+  inputRoot: {},
+  inputFocused: {
+    '&$inputRoot': {
+      backgroundColor: palette.grey[200],
+    },
+  },
+  iconBtn: {
+    padding: spacing(1),
+  },
+  svgIcon: {
+    fontSize: 20,
+  },
+  option: {
+    minHeight: 40,
+    fontSize: 15,
+    '&:hover': {
+      backgroundColor: palette.grey[100],
+    },
+  },
+  optionSelected: {
+    fontWeight: 500,
+    '&$option': {
+      backgroundColor: palette.grey[100],
+    },
+  },
+}));
+
 const DownshiftDemo = props => {
   const antStyles = useAntSelectStyles();
+  const customStyles = useCustomStyles();
   return (
     <Demo
       type={'grid'}
       demos={[
         ['Default', <DownshiftSelect {...props} />],
+        [
+          'Custom styles',
+          <DownshiftSelect
+            {...props}
+            variant={'standard'}
+            {...DownshiftSelect.getProps({ classes: customStyles })}
+            SvgClearIcon={ClearRounded}
+          />,
+        ],
         [
           'Ant Design',
           <DownshiftSelect

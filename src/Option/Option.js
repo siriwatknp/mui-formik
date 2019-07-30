@@ -1,78 +1,109 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import cx from 'clsx';
+import { withStyles } from '@material-ui/styles';
 import MenuItem from '@material-ui/core/MenuItem';
 import CheckRounded from '@material-ui/icons/CheckRounded';
-import { withStyles } from '@material-ui/styles';
+import styles from './styles';
+import { pick } from '../utils/functions';
 
-export const styles = ({ palette }) => ({
-  option: {},
-  optionHighlighted: {
-    backgroundColor: palette.divider,
-    '&:hover': {
-      backgroundColor: palette.divider,
-    },
+const Option = withStyles(styles, { name: 'FmkOption' })(
+  ({
+    hoverless,
+    highlighted,
+    classes,
+    overrides,
+    children,
+    selected,
+    menuItemClasses,
+    svgIcon,
+    svgIconClasses,
+    SvgIconProps,
+    optionClasses, // not used => prevent warning
+    optionOverrides, // not used => prevent warning
+    ...props
+  }) => {
+    const css = overrides || classes;
+    return (
+      <MenuItem
+        selected={selected}
+        {...props}
+        classes={{
+          ...menuItemClasses,
+          root: cx(
+            css.option,
+            highlighted && css.optionHighlighted,
+            hoverless && css.optionHoverless,
+            menuItemClasses.root,
+          ),
+          selected: cx(css.optionSelected, menuItemClasses.selected),
+        }}
+      >
+        {children}
+        <CheckRounded
+          component={svgIcon}
+          {...SvgIconProps}
+          classes={{
+            ...svgIconClasses,
+            root: cx(
+              css.icon,
+              highlighted && css.iconHighlighted,
+              selected && css.iconSelected,
+              svgIconClasses.root,
+            ),
+          }}
+        />
+      </MenuItem>
+    );
   },
-  optionHoverless: {
-    '&:hover': {
-      backgroundColor: 'transparent',
-    },
-  },
-  optionSelected: {
-    '&$option': {
-      backgroundColor: palette.primary.main,
-      color: palette.common.white,
-      '&:hover': {
-        backgroundColor: palette.primary.light,
-      },
-    },
-  },
-  icon: {
-    opacity: 0,
-    marginLeft: 'auto',
-    fontSize: 18,
-  },
-  iconHighlighted: {
-    opacity: 1,
-  },
-  iconSelected: {
-    opacity: 1,
-    color: palette.primary.main,
-  },
-});
+);
 
-const Option = ({
-  hoverless,
-  highlighted,
+Option.propTypes = {
+  hoverless: PropTypes.bool,
+  highlighted: PropTypes.bool,
+  selected: PropTypes.bool,
+  classes: PropTypes.shape({}),
+  overrides: PropTypes.shape({}),
+  menuItemClasses: PropTypes.shape({}),
+  svgIcon: PropTypes.node,
+  svgIconClasses: PropTypes.shape({}),
+  SvgIconProps: PropTypes.shape({}),
+};
+Option.defaultProps = {
+  hoverless: false,
+  highlighted: false,
+  selected: false,
+  classes: {},
+  overrides: undefined,
+  menuItemClasses: {},
+  svgIcon: undefined,
+  svgIconClasses: {},
+  SvgIconProps: {},
+};
+Option.pickClasses = classes => pick(classes, styles.traits);
+Option.getProps = ({
+  optionClasses,
   classes,
+  optionOverrides,
   overrides,
-  children,
-  selected,
-  ...props
+  MenuItemProps,
+  menuItemClasses,
+  svgIconClasses,
+  SvgIconProps,
 }) => {
-  const css = overrides || classes;
-  return (
-    <MenuItem
-      selected={selected}
-      {...props}
-      classes={{
-        root: cx(
-          css.option,
-          highlighted && css.optionHighlighted,
-          hoverless && css.optionHoverless,
-        ),
-        selected: css.optionSelected,
-      }}
-    >
-      {children}
-      <CheckRounded
-        className={cx(
-          css.icon,
-          highlighted && css.iconHighlighted,
-          selected && css.iconSelected,
-        )}
-      />
-    </MenuItem>
-  );
+  const resultClasses = Option.pickClasses(optionClasses || classes);
+  const resultOverrides = Option.pickClasses(optionOverrides || overrides);
+  return {
+    // use this fn when this component render as nested component
+    classes: resultClasses,
+    overrides: resultOverrides,
+    optionClasses: resultClasses,
+    optionOverrides: resultOverrides,
+    ...MenuItemProps,
+    menuItemClasses,
+    svgIconClasses,
+    SvgIconProps,
+  };
 };
 
-export default withStyles(styles, { name: 'FmkOption' })(Option);
+export default Option;
