@@ -25,6 +25,7 @@ const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
     options,
     menuId,
     chipId,
+    variant,
     fullWidth,
     onChangeInput,
     onChange,
@@ -98,6 +99,13 @@ const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
             ...inputClasses,
             root: cx(css.field, inputClasses.root),
             input: cx(css.fieldInput, inputClasses.input),
+            focused: cx(css.fieldFocused, inputClasses.focused),
+            ...(variant === 'outlined' && {
+              notchedOutline: cx(
+                css.fieldNotchedOutline,
+                inputClasses.notchedOutline,
+              ),
+            }),
           },
           startAdornment: selectedItems.map(item => (
             <Chip
@@ -138,8 +146,8 @@ const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
             },
             {
               getItemProps: ({ item }) => ({
-                selected: selectedItems.includes(item),
-                onClick: () => {
+                onClick: e => {
+                  e.stopPropagation();
                   if (!selectedItems.includes(item)) {
                     setInputValue('');
                   }

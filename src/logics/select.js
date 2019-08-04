@@ -21,8 +21,10 @@ export const injectMenuProps = (
   },
   extra = {},
 ) => ({
-  menuId,
   getMenuProps,
+  itemToLabel,
+  itemToValue,
+  selectedItems,
   options: getSelectOptions(options, {
     maxOptionOutput,
     filterOption,
@@ -36,9 +38,9 @@ export const injectMenuProps = (
   getItemProps: ({ item, index }) =>
     getItemProps({
       key: itemToValue(item),
+      id: `${menuId}${itemToValue(item)}`,
       item,
       index,
-      children: itemToLabel(item),
       ...(extra.getItemProps && extra.getItemProps({ item, index })),
     }),
   renderEmpty,

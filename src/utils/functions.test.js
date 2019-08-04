@@ -57,6 +57,11 @@ const getOptions = (items, inputValue) =>
 const breakpoints = createBreakpoints({});
 
 describe('functions', () => {
+  let itemToValue;
+  beforeEach(() => {
+    itemToValue = item => (item ? item.value : '');
+  });
+
   it('should check if it is pairs', () => {
     expect(isPairs({})).toBeFalsy();
     expect(isPairs([])).toBeTruthy();
@@ -150,6 +155,7 @@ describe('functions', () => {
         filterOption: false,
         getOptions: false,
         inputValue: '',
+        itemToValue,
         selectedItems: [],
       }),
     ).toEqual(COUNTRIES);
@@ -160,6 +166,7 @@ describe('functions', () => {
         filterOption: false,
         getOptions: false,
         inputValue: '',
+        itemToValue,
         selectedItems: [],
       }).length,
     ).toEqual(5);
@@ -170,6 +177,7 @@ describe('functions', () => {
         filterOption: false,
         getOptions: false,
         inputValue: '',
+        itemToValue,
         selectedItems: [COUNTRIES[0], COUNTRIES[3]],
       }).length,
     ).toEqual(COUNTRIES.length - 2);
@@ -180,6 +188,7 @@ describe('functions', () => {
         filterOption: filterByInputValue,
         getOptions: false,
         inputValue: 'albania',
+        itemToValue,
         selectedItems: [],
       }).length,
     ).toEqual(1);
@@ -190,6 +199,7 @@ describe('functions', () => {
         filterOption: false,
         getOptions,
         inputValue: 'albania',
+        itemToValue,
         selectedItems: [],
       }).length,
     ).toEqual(1);

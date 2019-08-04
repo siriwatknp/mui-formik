@@ -7,7 +7,7 @@ import Link from '@material-ui/core/Link';
 
 import Form from './forms/Form';
 import TextField from '../src/TextField';
-import CheckField from '../src/CheckField';
+import CheckLabelField from '../src/CheckLabelField';
 import MultiSelectField from '../src/MultiSelectField';
 import DsSelectField from '../src/DsSelectField';
 import DsMultiSelectField from '../src/DsMultiSelectField';
@@ -44,8 +44,8 @@ storiesOf('Mui Formik', module)
         ),
       })}
     >
-      <CheckField
-        {...CheckField.baseProps}
+      <CheckLabelField
+        {...CheckLabelField.baseProps}
         name={'checked'}
         label={
           <>

@@ -3,7 +3,7 @@ import * as Yup from 'yup';
 import Link from '@material-ui/core/Link';
 import Form from './Form';
 import TextField from '../../src/TextField';
-import CheckField from '../../src/CheckField';
+import CheckLabelField from '../../src/CheckLabelField';
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -48,8 +48,8 @@ const SignUpForm = () => (
       type="password"
       required
     />
-    <CheckField
-      {...CheckField.baseProps}
+    <CheckLabelField
+      {...CheckLabelField.baseProps}
       name={'accepted'}
       label={
         <>

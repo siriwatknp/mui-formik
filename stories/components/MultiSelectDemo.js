@@ -97,7 +97,7 @@ const MultiSelectDemo = props => {
             {...props}
             label={''}
             selectedItemExcluded={false}
-            chipProps={{ deleteIcon: <Close /> }}
+            ChipProps={{ deleteIcon: <Close /> }}
             overrides={antStyles}
           />,
         ],

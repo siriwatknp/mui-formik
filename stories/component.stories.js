@@ -6,14 +6,11 @@ import { linkTo } from '@storybook/addon-links';
 import { boolean, select, text } from '@storybook/addon-knobs';
 
 import matchSorter from 'match-sorter';
-import Box from '@material-ui/core/Box';
-import Typography from '@material-ui/core/Typography';
 import OptionDemo from './components/OptionDemo';
 import OptionMenuDemo from './components/OptionMenuDemo';
 import MultiSelectDemo from './components/MultiSelectDemo';
 import DownshiftDemo from './components/DownshiftDemo';
 import MultiDownshiftDemo from './components/MultiDownshiftDemo';
-import DownshiftMultiSelect from '../src/DownshiftMultiSelect';
 
 import { filterByInputValue } from '../src/utils/functions';
 import { OPTIONS, COUNTRIES, HEROES } from './mock/options';

@@ -15,13 +15,12 @@ const styles = ({ spacing }) => ({
     width: 'auto',
     flexGrow: 1,
   },
+  fieldFocused: {},
+  fieldNotchedOutline: {},
   chipRoot: {
     marginRight: spacing(1),
     marginBottom: spacing(0.5),
   },
-  chipLabel: {},
-  chipDeletable: {},
-  chipDeleteIcon: {},
 });
 
 styles.traits = [
@@ -29,6 +28,8 @@ styles.traits = [
   'containerFullWidth',
   'field',
   'fieldInput',
+  'fieldFocused',
+  'fieldNotchedOutline',
   'chipRoot',
   'chipLabel',
   'chipDeletable',

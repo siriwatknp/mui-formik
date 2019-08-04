@@ -4,7 +4,7 @@ import Link from '@material-ui/core/Link';
 import Form from './Form';
 import TabsForm from '../../src/TabsForm';
 import TextField from '../../src/TextField';
-import CheckField from '../../src/CheckField';
+import CheckLabelField from '../../src/CheckLabelField';
 import DsSelectField from '../../src/DsSelectField';
 import DsMultiSelectField from '../../src/DsMultiSelectField';
 import { HEROES, COUNTRIES } from '../mock/options';
@@ -98,8 +98,8 @@ const ProfileForm = () => (
         </>
       )}
     </TabsForm>
-    <CheckField
-      {...CheckField.baseProps}
+    <CheckLabelField
+      {...CheckLabelField.baseProps}
       name={'accepted'}
       label={
         <>

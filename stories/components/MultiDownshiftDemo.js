@@ -1,8 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/styles';
-import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
 import Close from '@material-ui/icons/Close';
 import Demo from './Demo';
 import DownshiftMultiSelect from '../../src/DownshiftMultiSelect';
@@ -21,7 +17,7 @@ const DownshiftDemo = props => {
             {...props}
             selectedItemExcluded={false}
             label={''}
-            chipProps={{
+            ChipProps={{
               deleteIcon: <Close />,
             }}
             overrides={antStyles}

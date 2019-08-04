@@ -5,16 +5,16 @@ export const antInputBaseStyles = ({ palette }) => ({
   field: {
     flexWrap: 'wrap',
     padding: '4px 8px',
-    '&:hover $notchedOutline': {
+    '&:hover $fieldNotchedOutline': {
       borderColor: palette.primary.main,
     },
-    '&$focused $notchedOutline': {
+    '&$fieldFocused $fieldNotchedOutline': {
       borderWidth: 1,
       boxShadow: `0 0 0 2px ${Color(palette.primary.main)
         .fade(0.72)
         .toString()}`,
     },
-    '& .MuiChip-root': {
+    '& $chipRoot': {
       margin: '2px 8px 2px 0',
     },
   },
@@ -26,10 +26,10 @@ export const antInputBaseStyles = ({ palette }) => ({
     width: 'auto',
     flexGrow: 1,
   },
-  notchedOutline: {
+  fieldNotchedOutline: {
     borderColor: '#d9d9d9',
   },
-  focused: {},
+  fieldFocused: {},
 });
 
 export const useAntInputBaseStyles = makeStyles(antInputBaseStyles);

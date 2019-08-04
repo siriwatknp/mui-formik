@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import PropTypes from 'prop-types';
 import cx from 'clsx';
 import Downshift from 'downshift';
 import { withStyles } from '@material-ui/styles';
@@ -7,8 +8,13 @@ import TextField from '@material-ui/core/TextField';
 import IconButton from '@material-ui/core/IconButton';
 import ArrowDown from '@material-ui/icons/KeyboardArrowDownRounded';
 import ArrowUp from '@material-ui/icons/KeyboardArrowUpRounded';
+import styles from './styles';
 import OptionMenu from '../OptionMenu';
-import { filterByInputValue, getMultiSelectOptions } from '../utils/functions';
+import {
+  filterByInputValue,
+  getMultiSelectOptions,
+  pick,
+} from '../utils/functions';
 import { createStateReducer } from '../logics/downshift';
 import {
   injectMenuProps,
@@ -19,189 +25,241 @@ import {
 } from '../logics/select';
 import Collection from '../utils/collection';
 
-const styles = ({ spacing }) => ({
-  // Root CSS
-  container: {
-    position: 'relative',
-    display: 'inline-block',
-  },
-  containerFullWidth: {
-    display: 'block',
-  },
-  // TextField CSS
-  field: {
-    flexWrap: 'wrap',
-    padding: '12px 0 8px 12px',
-    paddingRight: spacing(6.5),
-  },
-  fieldInput: {
-    padding: '8px 8px 9px 4px',
-    width: 'auto',
-    flexGrow: 1,
-  },
-  chipRoot: {
-    marginRight: spacing(1),
-    marginBottom: spacing(0.5),
-  },
-  // Toggle & Clear Btn
-  iconBtn: {
-    position: 'absolute',
-    top: '50%',
-    right: 4,
-    transform: 'translateY(-50%)',
-  },
-  iconBtnLabel: {},
-  // Toggle Btn
-  toggleBtn: {},
-  // Clear Btn
-  clearBtn: {},
-  // the rest is OptionMenu CSS API
-});
-
-const DownshiftMultiSelect = props => {
-  const {
-    fullWidth,
-    chipProps,
-    classes,
-    overrides,
-    itemToValue,
-    itemToLabel,
-    fullOptionReturned,
-    onChange: onChangeDS,
-    onBlur: onBlurDS,
-  } = props;
-  const css = overrides || classes;
-  const inputRef = useRef(null);
-  const [selectedItems, setSelectedItems] = useState([]);
-  const returnValue = cb => (items, ...args) => {
-    return fullOptionReturned ? cb(items, ...args) : cb(items.map(itemToValue));
-  };
-  const handleChange = returnValue(onChangeDS);
-  const handleBlur = returnValue(onBlurDS);
-  const stateUpdater = newItems => {
-    setSelectedItems(newItems);
-    handleChange(newItems);
-  };
-  const { removeItem, handleSelection, handleKeyDown } = getMultiSelectLogic(
-    Collection(selectedItems, itemToValue),
-    stateUpdater,
-  );
-  return (
-    <Downshift
-      id="downshift-multiple"
-      itemToString={itemToValue}
-      stateReducer={createStateReducer({ multipleSelect: true })}
-      onChange={handleSelection}
-      selectedItem={null}
-    >
-      {downshift => {
-        const {
-          getInputProps,
-          getToggleButtonProps,
-          openMenu,
-          isOpen,
-          inputValue,
-          highlightedIndex,
-        } = downshift;
-        const { value, onChange, onBlur, ...inputProps } = getInputProps({
-          onKeyDown: handleKeyDown(inputValue),
-          onBlur: () => handleBlur(selectedItems),
-        });
-        const toggleBtnProps = getToggleButtonProps({
-          onClick: e => {
-            e.stopPropagation();
-            if (inputRef.current && !isOpen) {
-              inputRef.current.focus();
-            }
-          },
-        });
-        return (
-          <div
-            className={cx(css.container, fullWidth && css.containerFullWidth)}
-          >
-            <TextField
-              {...injectTextFieldProps({
-                ...props,
-                ...downshift,
-                inputProps,
-                inputRef,
-                value,
-                onChange,
-                onBlur,
-              })}
-              onClick={() => {
-                openMenu();
-              }}
-              required={false}
-              InputProps={{
-                classes: {
-                  ...css,
-                  root: css.field,
-                  input: css.fieldInput,
-                },
-                startAdornment: selectedItems.map(item => {
-                  return (
-                    <Chip
-                      key={itemToValue(item)}
-                      {...chipProps}
-                      onClick={() => {
-                        openMenu();
-                      }}
-                      classes={{
-                        root: css.chipRoot,
-                        label: css.chipLabel,
-                        deleteIcon: css.chipDeleteIcon,
-                        deletable: css.chipDeletable,
-                      }}
-                      label={itemToLabel(item)}
-                      onDelete={e => {
-                        e.stopPropagation();
-                        removeItem(item);
-                      }}
-                    />
-                  );
-                }),
-                endAdornment: (
-                  <IconButton
-                    {...toggleBtnProps}
-                    classes={{
-                      root: cx(css.iconBtn, css.toggleBtn),
-                      label: css.iconBtnLabel,
-                    }}
-                  >
-                    {isOpen ? <ArrowUp /> : <ArrowDown />}
-                  </IconButton>
-                ),
-              }}
-              // eslint-disable-next-line react/jsx-no-duplicate-props
-            />
-            {isOpen && (
-              <OptionMenu
-                {...injectMenuProps(
-                  {
-                    ...props,
-                    ...downshift,
-                    selectedItems,
-                    getSelectOptions: getMultiSelectOptions,
-                  },
-                  {
-                    getItemProps: ({ item, index }) => ({
-                      selected: !!selectedItems.includes(item),
-                      highlighted: highlightedIndex === index,
-                      hoverless: true,
+const DownshiftMultiSelect = withStyles(styles, { name: 'MultiDownshift' })(
+  props => {
+    const {
+      variant,
+      fullWidth,
+      itemToValue,
+      itemToLabel,
+      fullOptionReturned,
+      onChange: onChangeDS,
+      onBlur: onBlurDS,
+      // props for nested components
+      classes,
+      overrides,
+      InputProps,
+      inputClasses,
+      ChipProps,
+      chipClasses,
+      IconButtonProps,
+      iconButtonClasses,
+      svgIconClasses,
+      SvgToggleUpIcon,
+      SvgToggleDownIcon,
+    } = props;
+    const css = overrides || classes;
+    const inputRef = useRef(null);
+    const [selectedItems, setSelectedItems] = useState([]);
+    const returnValue = cb => (items, ...args) => {
+      return fullOptionReturned
+        ? cb(items, ...args)
+        : cb(items.map(itemToValue));
+    };
+    const handleChange = returnValue(onChangeDS);
+    const handleBlur = returnValue(onBlurDS);
+    const stateUpdater = newItems => {
+      setSelectedItems(newItems);
+      handleChange(newItems);
+    };
+    const { removeItem, handleSelection, handleKeyDown } = getMultiSelectLogic(
+      Collection(selectedItems, itemToValue),
+      stateUpdater,
+    );
+    return (
+      <Downshift
+        id="downshift-multiple"
+        itemToString={itemToValue}
+        stateReducer={createStateReducer({ multipleSelect: true })}
+        onChange={handleSelection}
+        selectedItem={null}
+      >
+        {downshift => {
+          const {
+            getInputProps,
+            getToggleButtonProps,
+            openMenu,
+            isOpen,
+            inputValue,
+            highlightedIndex,
+          } = downshift;
+          const { value, onChange, onBlur, ...inputProps } = getInputProps({
+            onKeyDown: handleKeyDown(inputValue),
+            onBlur: () => handleBlur(selectedItems),
+          });
+          const toggleBtnProps = getToggleButtonProps({
+            ...IconButtonProps,
+            onClick: e => {
+              e.stopPropagation();
+              if (IconButtonProps.onClick) {
+                IconButtonProps.onClick(e);
+              }
+              if (inputRef.current && !isOpen) {
+                inputRef.current.focus();
+              }
+            },
+          });
+          return (
+            <div
+              className={cx(css.container, fullWidth && css.containerFullWidth)}
+            >
+              <TextField
+                {...injectTextFieldProps({
+                  ...props,
+                  ...downshift,
+                  inputProps,
+                  inputRef,
+                  value,
+                  onChange,
+                  onBlur,
+                })}
+                onClick={() => {
+                  openMenu();
+                }}
+                required={false}
+                InputProps={{
+                  ...InputProps,
+                  classes: {
+                    ...inputClasses,
+                    root: cx(css.field, inputClasses.root),
+                    input: cx(css.fieldInput, inputClasses.input),
+                    focused: cx(css.fieldFocused, inputClasses.focused),
+                    ...(variant === 'outlined' && {
+                      notchedOutline: cx(
+                        css.fieldNotchedOutline,
+                        inputClasses.notchedOutline,
+                      ),
                     }),
                   },
-                )}
+                  startAdornment: selectedItems.map(item => {
+                    return (
+                      <Chip
+                        key={itemToValue(item)}
+                        {...ChipProps}
+                        onClick={() => {
+                          openMenu();
+                        }}
+                        classes={{
+                          ...chipClasses,
+                          root: cx(css.chipRoot, chipClasses.root),
+                          label: cx(css.chipLabel, chipClasses.label),
+                          deleteIcon: cx(
+                            css.chipDeleteIcon,
+                            chipClasses.deleteIcon,
+                          ),
+                          deletable: cx(
+                            css.chipDeletable,
+                            chipClasses.deletable,
+                          ),
+                        }}
+                        label={itemToLabel(item)}
+                        onDelete={e => {
+                          e.stopPropagation();
+                          removeItem(item);
+                        }}
+                      />
+                    );
+                  }),
+                  endAdornment: (
+                    <IconButton
+                      {...toggleBtnProps}
+                      classes={{
+                        ...iconButtonClasses,
+                        root: cx(
+                          css.iconBtn,
+                          css.toggleBtn,
+                          iconButtonClasses.root,
+                        ),
+                        label: cx(css.iconBtnLabel, iconButtonClasses.label),
+                      }}
+                    >
+                      {isOpen ? (
+                        <ArrowUp
+                          classes={{
+                            ...svgIconClasses,
+                            root: cx(css.svgIcon, svgIconClasses.root),
+                          }}
+                          component={SvgToggleUpIcon}
+                        />
+                      ) : (
+                        <ArrowDown
+                          classes={{
+                            ...svgIconClasses,
+                            root: cx(css.svgIcon, svgIconClasses.root),
+                          }}
+                          component={SvgToggleDownIcon}
+                        />
+                      )}
+                    </IconButton>
+                  ),
+                }}
+                // eslint-disable-next-line react/jsx-no-duplicate-props
               />
-            )}
-          </div>
-        );
-      }}
-    </Downshift>
-  );
-};
+              {isOpen && (
+                <OptionMenu
+                  {...injectMenuProps(
+                    {
+                      ...props,
+                      ...downshift,
+                      selectedItems,
+                      getSelectOptions: getMultiSelectOptions,
+                    },
+                    {
+                      getItemProps: ({ index }) => ({
+                        highlighted: highlightedIndex === index,
+                      }),
+                    },
+                  )}
+                  {...OptionMenu.getProps(props)}
+                />
+              )}
+            </div>
+          );
+        }}
+      </Downshift>
+    );
+  },
+);
 
-DownshiftMultiSelect.propTypes = {};
+DownshiftMultiSelect.propTypes = {
+  options: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({}),
+      PropTypes.string,
+      PropTypes.number,
+    ]),
+  ),
+  value: PropTypes.arrayOf(
+    PropTypes.oneOfType([
+      PropTypes.shape({}),
+      PropTypes.string,
+      PropTypes.number,
+    ]),
+  ),
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+  onChange: PropTypes.func,
+  onChangeInput: PropTypes.func,
+  selectedItemExcluded: PropTypes.bool,
+  fullOptionReturned: PropTypes.bool,
+  filterOption: PropTypes.func,
+  itemToLabel: PropTypes.func,
+  itemToValue: PropTypes.func,
+  classes: PropTypes.shape({}),
+  overrides: PropTypes.shape({}),
+  inputClasses: PropTypes.shape({}),
+  InputProps: PropTypes.shape({}),
+  chipClasses: PropTypes.shape({}),
+  ChipProps: PropTypes.shape({}),
+  iconButtonClasses: PropTypes.shape({}),
+  IconButtonProps: PropTypes.shape({}),
+  InputLabelProps: PropTypes.shape({}),
+  FormHelperTextProps: PropTypes.shape({}),
+  svgIconClasses: PropTypes.shape({}),
+  SvgClearIcon: PropTypes.elementType,
+  SvgToggleUpIcon: PropTypes.elementType,
+  SvgToggleDownIcon: PropTypes.elementType,
+};
 DownshiftMultiSelect.defaultProps = {
   options: [],
   maxOptionOutput: 5,
@@ -213,8 +271,61 @@ DownshiftMultiSelect.defaultProps = {
   itemToValue: defaultItemToValue,
   onChange: () => {},
   onBlur: () => {},
+  classes: {},
+  overrides: undefined,
+  inputClasses: {},
+  InputProps: {},
+  chipClasses: {},
+  ChipProps: {},
+  iconButtonClasses: {},
+  IconButtonProps: {},
+  InputLabelProps: {},
+  FormHelperTextProps: {},
+  svgIconClasses: {},
+  SvgClearIcon: undefined,
+  SvgToggleUpIcon: undefined,
+  SvgToggleDownIcon: undefined,
+};
+DownshiftMultiSelect.pickClasses = classes => pick(classes, styles.traits);
+DownshiftMultiSelect.getProps = ({
+  // use this fn when this component render as nested component
+  multiDownshiftClasses,
+  classes,
+  multiDownshiftOverrides,
+  overrides,
+  inputClasses,
+  InputProps,
+  ChipProps,
+  chipClasses,
+  iconButtonClasses,
+  IconButtonProps,
+  svgIconClasses,
+  SvgToggleUpIcon,
+  SvgToggleDownIcon,
+  ...props
+}) => {
+  const resultClasses = DownshiftMultiSelect.pickClasses(
+    multiDownshiftClasses || classes,
+  );
+  const resultOverrides = DownshiftMultiSelect.pickClasses(
+    multiDownshiftOverrides || overrides,
+  );
+  return {
+    ...OptionMenu.getProps({ classes, overrides, ...props }),
+    InputProps,
+    inputClasses,
+    ChipProps,
+    chipClasses,
+    iconButtonClasses,
+    IconButtonProps,
+    svgIconClasses,
+    SvgToggleUpIcon,
+    SvgToggleDownIcon,
+    classes: resultClasses,
+    overrides: resultOverrides,
+    multiDownshiftClasses: resultClasses,
+    multiDownshiftOverrides: resultOverrides,
+  };
 };
 
-export default withStyles(styles, { name: 'MultiDownshift' })(
-  DownshiftMultiSelect,
-);
+export default DownshiftMultiSelect;

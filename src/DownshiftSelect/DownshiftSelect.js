@@ -21,6 +21,7 @@ import {
 
 const DownshiftSelect = withStyles(styles, { name: 'Downshift' })(props => {
   const {
+    variant,
     fullWidth,
     itemToValue,
     menuClosedAfterClicked,
@@ -118,6 +119,13 @@ const DownshiftSelect = withStyles(styles, { name: 'Downshift' })(props => {
                   ...inputClasses,
                   root: cx(css.field, inputClasses.root),
                   input: cx(css.fieldInput, inputClasses.input),
+                  focused: cx(css.fieldFocused, inputClasses.focused),
+                  ...(variant === 'outlined' && {
+                    notchedOutline: cx(
+                      css.fieldNotchedOutline,
+                      inputClasses.notchedOutline,
+                    ),
+                  }),
                 },
                 endAdornment: (
                   <>

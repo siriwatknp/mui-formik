@@ -11,23 +11,22 @@ const Option = withStyles(styles, { name: 'FmkOption' })(
   ({
     hoverless,
     highlighted,
+    selected,
     classes,
     overrides,
     children,
-    selected,
+    MenuItemProps,
     menuItemClasses,
     svgIcon,
     svgIconClasses,
     SvgIconProps,
-    optionClasses, // not used => prevent warning
-    optionOverrides, // not used => prevent warning
-    ...props
   }) => {
     const css = overrides || classes;
+    console.log('classes', classes);
     return (
       <MenuItem
+        {...MenuItemProps}
         selected={selected}
-        {...props}
         classes={{
           ...menuItemClasses,
           root: cx(
@@ -64,6 +63,7 @@ Option.propTypes = {
   selected: PropTypes.bool,
   classes: PropTypes.shape({}),
   overrides: PropTypes.shape({}),
+  MenuItemProps: PropTypes.shape({}),
   menuItemClasses: PropTypes.shape({}),
   svgIcon: PropTypes.node,
   svgIconClasses: PropTypes.shape({}),
@@ -75,6 +75,7 @@ Option.defaultProps = {
   selected: false,
   classes: {},
   overrides: undefined,
+  MenuItemProps: {},
   menuItemClasses: {},
   svgIcon: undefined,
   svgIconClasses: {},
