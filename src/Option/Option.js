@@ -1,28 +1,28 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import cx from 'clsx';
-import { withStyles } from '@material-ui/styles';
+import { withStyles } from 'mui-styling';
 import MenuItem from '@material-ui/core/MenuItem';
 import CheckRounded from '@material-ui/icons/CheckRounded';
-import styles from './styles';
-import { pick } from '../utils/functions';
+import createStyles from './Option.styles';
 
-const Option = withStyles(styles, { name: 'FmkOption' })(
+const Option = withStyles(createStyles, { name: 'Option' })(
   ({
-    hoverless,
+    css,
     highlighted,
     selected,
-    classes,
-    overrides,
     children,
     MenuItemProps,
     menuItemClasses,
-    svgIcon,
-    svgIconClasses,
-    SvgIconProps,
+    // svg icon start
+    renderIconStart,
+    // svg icon end
+    renderIconEnd,
+    renderOption,
   }) => {
-    const css = overrides || classes;
-    console.log('classes', classes);
+    if (typeof renderOption === 'function') {
+      return renderOption({ children, highlighted, selected });
+    }
     return (
       <MenuItem
         {...MenuItemProps}
@@ -32,78 +32,83 @@ const Option = withStyles(styles, { name: 'FmkOption' })(
           root: cx(
             css.option,
             highlighted && css.optionHighlighted,
-            hoverless && css.optionHoverless,
             menuItemClasses.root,
           ),
           selected: cx(css.optionSelected, menuItemClasses.selected),
         }}
       >
-        {children}
-        <CheckRounded
-          component={svgIcon}
-          {...SvgIconProps}
-          classes={{
-            ...svgIconClasses,
-            root: cx(
+        {typeof renderIconStart === 'function' &&
+          renderIconStart({
+            highlighted,
+            selected,
+            className: cx(
               css.icon,
+              css.iconStart,
               highlighted && css.iconHighlighted,
+              highlighted && css.iconStartHighlighted,
               selected && css.iconSelected,
-              svgIconClasses.root,
+              selected && css.iconStartSelected,
             ),
-          }}
-        />
+          })}
+        {children}
+        {typeof renderIconEnd === 'function' &&
+          renderIconEnd({
+            highlighted,
+            selected,
+            className: cx(
+              css.icon,
+              css.iconEnd,
+              highlighted && css.iconHighlighted,
+              highlighted && css.iconEndHighlighted,
+              selected && css.iconSelected,
+              selected && css.iconEndSelected,
+            ),
+          })}
       </MenuItem>
     );
   },
 );
 
 Option.propTypes = {
-  hoverless: PropTypes.bool,
   highlighted: PropTypes.bool,
   selected: PropTypes.bool,
   classes: PropTypes.shape({}),
   overrides: PropTypes.shape({}),
   MenuItemProps: PropTypes.shape({}),
   menuItemClasses: PropTypes.shape({}),
-  svgIcon: PropTypes.node,
-  svgIconClasses: PropTypes.shape({}),
-  SvgIconProps: PropTypes.shape({}),
+  renderIconStart: PropTypes.func,
+  renderIconEnd: PropTypes.func,
+  renderOption: PropTypes.func,
 };
 Option.defaultProps = {
-  hoverless: false,
   highlighted: false,
   selected: false,
   classes: {},
   overrides: undefined,
   MenuItemProps: {},
   menuItemClasses: {},
-  svgIcon: undefined,
-  svgIconClasses: {},
-  SvgIconProps: {},
+  renderIconStart: undefined,
+  renderIconEnd: ({ className }) => <CheckRounded className={className} />,
+  renderOption: undefined,
 };
-Option.pickClasses = classes => pick(classes, styles.traits);
 Option.getProps = ({
-  optionClasses,
-  classes,
-  optionOverrides,
-  overrides,
   MenuItemProps,
   menuItemClasses,
   svgIconClasses,
   SvgIconProps,
+  renderIconStart,
+  renderIconEnd,
+  renderOption,
 }) => {
-  const resultClasses = Option.pickClasses(optionClasses || classes);
-  const resultOverrides = Option.pickClasses(optionOverrides || overrides);
   return {
     // use this fn when this component render as nested component
-    classes: resultClasses,
-    overrides: resultOverrides,
-    optionClasses: resultClasses,
-    optionOverrides: resultOverrides,
     ...MenuItemProps,
     menuItemClasses,
     svgIconClasses,
     SvgIconProps,
+    renderIconStart,
+    renderIconEnd,
+    renderOption,
   };
 };
 

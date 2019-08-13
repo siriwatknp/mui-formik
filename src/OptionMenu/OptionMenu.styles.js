@@ -1,4 +1,7 @@
-const styles = ({ palette, spacing }) => ({
+import { mergeStyleCreators } from 'mui-styling';
+import { createStyles } from '../Option';
+
+export default mergeStyleCreators(createStyles, ({ palette, spacing }) => ({
   menuContainer: {
     position: 'absolute',
     width: '100%',
@@ -21,8 +24,4 @@ const styles = ({ palette, spacing }) => ({
     marginBottom: spacing(1),
   },
   emptyText: {},
-});
-
-styles.traits = ['menuContainer', 'emptyRoot', 'emptyIcon', 'emptyText'];
-
-export default styles;
+}));

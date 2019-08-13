@@ -1,16 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/styles';
+import { withStyles } from 'mui-styling';
 import Paper from '@material-ui/core/Paper';
 import InboxTwoTone from '@material-ui/icons/InboxTwoTone';
 import Typography from '@material-ui/core/Typography';
+import createStyles from './OptionMenu.styles';
 import Option from '../Option';
-import styles from './styles';
 import { defaultItemToLabel, defaultItemToValue } from '../logics/select';
-import { pick } from '../utils/functions';
 
-const OptionMenu = withStyles(styles, { name: 'FmkOptionMenu' })(props => {
+const OptionMenu = withStyles(createStyles, { name: 'OptionMenu' })(props => {
   const {
+    css, // from mui-styling withStyles
     options,
     selectedItems,
     itemToValue,
@@ -19,12 +19,8 @@ const OptionMenu = withStyles(styles, { name: 'FmkOptionMenu' })(props => {
     getMenuProps,
     getItemProps,
     PaperProps,
-    classes,
-    overrides,
   } = props;
-  const { menuContainer, emptyRoot, emptyIcon, emptyText } =
-    overrides || classes;
-  console.log('classes', classes);
+  const { menuContainer, emptyRoot, emptyIcon, emptyText } = css;
   const empty = () => {
     if (renderEmpty === false) return null;
     if (typeof renderEmpty === 'function') return renderEmpty();
@@ -47,6 +43,7 @@ const OptionMenu = withStyles(styles, { name: 'FmkOptionMenu' })(props => {
             selected={selectedItems.includes(item)}
             highlighted={highlighted}
             MenuItemProps={MenuItemProps}
+            {...Option.getOverrides(css, props)}
             {...Option.getProps(props)}
           >
             {itemToLabel(item)}
@@ -86,28 +83,9 @@ OptionMenu.defaultProps = {
   overrides: undefined,
   PaperProps: undefined,
 };
-OptionMenu.pickClasses = classes => pick(classes, styles.traits);
-OptionMenu.getProps = ({
-  optionMenuClasses,
-  classes,
-  optionMenuOverrides,
-  overrides,
+OptionMenu.getProps = ({ PaperProps }) => ({
+  // use this fn when this component render as nested component
   PaperProps,
-  ...props
-}) => {
-  const resultClasses = OptionMenu.pickClasses(optionMenuClasses || classes);
-  const resultOverrides = OptionMenu.pickClasses(
-    optionMenuOverrides || overrides,
-  );
-  return {
-    // use this fn when this component render as nested component
-    ...Option.getProps({ classes, overrides, ...props }),
-    classes: resultClasses,
-    overrides: resultOverrides,
-    optionMenuClasses: resultClasses,
-    optionMenuOverrides: resultOverrides,
-    PaperProps,
-  };
-};
+});
 
 export default OptionMenu;

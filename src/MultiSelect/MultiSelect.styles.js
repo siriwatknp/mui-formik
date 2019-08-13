@@ -1,4 +1,7 @@
-const styles = ({ spacing }) => ({
+import { mergeStyleCreators } from 'mui-styling';
+import { createStyles } from '../OptionMenu';
+
+export default mergeStyleCreators(createStyles, ({ spacing }) => ({
   container: {
     position: 'relative',
     display: 'inline-block',
@@ -21,19 +24,4 @@ const styles = ({ spacing }) => ({
     marginRight: spacing(1),
     marginBottom: spacing(0.5),
   },
-});
-
-styles.traits = [
-  'container',
-  'containerFullWidth',
-  'field',
-  'fieldInput',
-  'fieldFocused',
-  'fieldNotchedOutline',
-  'chipRoot',
-  'chipLabel',
-  'chipDeletable',
-  'chipDeleteIcon',
-];
-
-export default styles;
+}));

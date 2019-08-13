@@ -1,21 +1,23 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import cx from 'clsx';
 import { FastField, Field } from 'formik';
-import { withStyles } from '@material-ui/styles';
+import { withStyles } from 'mui-styling';
 import FormControl from '@material-ui/core/FormControl';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormHelperText from '@material-ui/core/FormHelperText';
 import MuiCheckbox from '@material-ui/core/Checkbox/Checkbox';
-import styles from './styles';
-import { getErrorFromField, pick } from '../utils/functions';
+import createStyles from './CheckLabelField.styles';
+import { getErrorFromField } from '../utils/functions';
 
-const Component = withStyles(styles, { name: 'CheckLabelField' })(
+const Component = withStyles(createStyles, { name: 'CheckLabelField' })(
   ({
     field,
     field: { value },
     form,
     helperText,
     label,
+    css,
     FormControlProps,
     formControlClasses,
     FormControlLabelProps,
@@ -24,10 +26,7 @@ const Component = withStyles(styles, { name: 'CheckLabelField' })(
     checkboxClasses,
     FormHelperTextProps,
     formHelperTextClasses,
-    classes,
-    overrides,
   }) => {
-    const css = overrides || classes;
     const [errorShown, errorText] = getErrorFromField({ field, form });
     return (
       <FormControl
@@ -53,8 +52,8 @@ const Component = withStyles(styles, { name: 'CheckLabelField' })(
         />
         {(helperText || errorShown) && (
           <FormHelperText
-            classes={formHelperTextClasses}
             {...FormHelperTextProps}
+            classes={formHelperTextClasses}
           >
             {errorShown ? errorText : helperText}
           </FormHelperText>
@@ -73,7 +72,26 @@ const CheckLabelField = ({ fastFieldUsed, ...props }) => {
   );
 };
 
-CheckLabelField.pickClasses = classes => pick(classes, styles.traits);
+CheckLabelField.propTypes = {
+  FormControlProps: PropTypes.shape({}),
+  formControlClasses: PropTypes.shape({}),
+  FormControlLabelProps: PropTypes.shape({}),
+  formControlLabelClasses: PropTypes.shape({}),
+  CheckboxProps: PropTypes.shape({}),
+  checkboxClasses: PropTypes.shape({}),
+  FormHelperTextProps: PropTypes.shape({}),
+  formHelperTextClasses: PropTypes.shape({}),
+};
+CheckLabelField.defaultProps = {
+  FormControlProps: {},
+  formControlClasses: {},
+  FormControlLabelProps: {},
+  formControlLabelClasses: {},
+  CheckboxProps: {},
+  checkboxClasses: {},
+  FormHelperTextProps: {},
+  formHelperTextClasses: {},
+};
 CheckLabelField.getProps = ({
   FormControlProps,
   formControlClasses,
@@ -83,35 +101,25 @@ CheckLabelField.getProps = ({
   checkboxClasses,
   FormHelperTextProps,
   formHelperTextClasses,
-  classes,
   checkLabelFieldClasses,
-  overrides,
   checkLabelFieldOverrides,
-}) => {
-  const resultClasses = CheckLabelField.pickClasses(
-    checkLabelFieldClasses || classes,
-  );
-  const resultOverrides = CheckLabelField.pickClasses(
-    checkLabelFieldOverrides || overrides,
-  );
-  return {
-    FormControlProps,
-    formControlClasses,
-    FormControlLabelProps,
-    formControlLabelClasses,
-    CheckboxProps,
-    checkboxClasses,
-    FormHelperTextProps,
-    formHelperTextClasses,
-    checkLabelFieldClasses,
-    checkLabelFieldOverrides,
-    classes: resultClasses,
-    overrides: resultOverrides,
-  };
-};
+}) => ({
+  FormControlProps,
+  formControlClasses,
+  FormControlLabelProps,
+  formControlLabelClasses,
+  CheckboxProps,
+  checkboxClasses,
+  FormHelperTextProps,
+  formHelperTextClasses,
+  checkLabelFieldClasses,
+  checkLabelFieldOverrides,
+});
 CheckLabelField.baseProps = {
-  fullWidth: true,
-  margin: 'normal',
+  FormControlProps: {
+    fullWidth: true,
+    margin: 'normal',
+  },
 };
 
 export default CheckLabelField;

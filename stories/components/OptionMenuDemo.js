@@ -1,6 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/styles';
+import cx from 'clsx';
 import Color from 'color';
+import CheckBoxOutlineBlankRounded from '@material-ui/icons/CheckBoxOutlineBlankRounded';
+import CheckBoxRounded from '@material-ui/icons/CheckBoxRounded';
 import Demo from './Demo';
 import OptionMenu from '../../src/OptionMenu';
 import { antOptionStyles } from '../../src/styles/OptionStyles';
@@ -21,7 +24,7 @@ const useCustomStyles = makeStyles(({ palette }) => {
       fontSize: 15,
       '&:hover': {
         backgroundColor: palette.grey[100],
-      }
+      },
     },
     optionSelected: {
       '&$option': {
@@ -35,6 +38,26 @@ const useCustomStyles = makeStyles(({ palette }) => {
   };
 });
 
+const useCustomStyles2 = makeStyles(theme => {
+  const { palette } = theme;
+  return {
+    option: {},
+    optionSelected: {
+      color: palette.secondary.main,
+      '&$option': {
+        backgroundColor: '#fff0f5',
+      },
+    },
+    iconStart: {
+      fontSize: 24,
+      marginRight: 8,
+    },
+    iconStartSelected: {
+      color: palette.secondary.main,
+    },
+  };
+});
+
 const useAntStyles = makeStyles(theme => ({
   ...antOptionStyles(theme),
   ...antOptionMenuStyles(theme),
@@ -43,6 +66,7 @@ const useAntStyles = makeStyles(theme => ({
 const OptionMenuDemo = props => {
   const antStyles = useAntStyles();
   const customStyles = useCustomStyles();
+  const customStyles2 = useCustomStyles2();
   return (
     <Demo
       type={'grid'}
@@ -52,12 +76,28 @@ const OptionMenuDemo = props => {
           'Custom styles',
           <OptionMenu
             {...props}
-            classes={OptionMenu.pickClasses(customStyles)}
-            optionClasses={customStyles}
+            classes={customStyles}
             PaperProps={{ square: true }}
           />,
         ],
-        ['Ant Design', <OptionMenu overrides={antStyles} {...props} />],
+        [
+          'Custom icon',
+          <OptionMenu
+            {...props}
+            classes={customStyles2}
+            renderIconStart={({ selected, className }) => {
+              if (selected) return <CheckBoxRounded className={className} />;
+              return (
+                <CheckBoxOutlineBlankRounded
+                  className={className}
+                  color={'action'}
+                />
+              );
+            }}
+            renderIconEnd={null}
+          />,
+        ],
+        ['Ant Design', <OptionMenu {...props} overrides={antStyles} />],
       ]}
       getItemProps={() => ({ height: 260 })}
     />

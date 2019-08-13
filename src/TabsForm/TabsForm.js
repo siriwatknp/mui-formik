@@ -1,10 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { useDetectErrorKey } from '../logics';
 
-const Component = ({ tabs, value, setValue, field, form, ...props }) => {
+const Component = ({
+  tabs,
+  value,
+  setValue,
+  field,
+  form,
+  TabsProps,
+  SingleTabProps,
+}) => {
   useDetectErrorKey({
     keys: tabs.map(({ value: tabValue }) => tabValue),
     value,
@@ -13,15 +22,26 @@ const Component = ({ tabs, value, setValue, field, form, ...props }) => {
     form,
   });
   return (
-    <Tabs value={value} {...props} onChange={(_, tabKey) => setValue(tabKey)}>
+    <Tabs
+      value={value}
+      {...TabsProps}
+      onChange={(_, tabKey) => setValue(tabKey)}
+    >
       {tabs.map(tabProps => (
-        <Tab key={tabProps.value} {...tabProps} />
+        <Tab key={tabProps.value} {...SingleTabProps} {...tabProps} />
       ))}
     </Tabs>
   );
 };
 
-const TabsForm = ({ initialTab, name, tabs, children }) => {
+const TabsForm = ({
+  initialTab,
+  name,
+  tabs,
+  TabsProps,
+  SingleTabProps,
+  children,
+}) => {
   if (!tabs || !tabs.length) return null;
   const [tab, setTab] = React.useState(initialTab || tabs[0].value);
   return (
@@ -34,6 +54,8 @@ const TabsForm = ({ initialTab, name, tabs, children }) => {
             field={field}
             form={form}
             setValue={setTab}
+            TabsProps={TabsProps}
+            SingleTabProps={SingleTabProps}
           />
         )}
       </Field>
@@ -42,7 +64,20 @@ const TabsForm = ({ initialTab, name, tabs, children }) => {
   );
 };
 
-TabsForm.propTypes = {};
-TabsForm.defaultProps = {};
+TabsForm.propTypes = {
+  tabs: PropTypes.arrayOf(
+    PropTypes.shape({
+      value: PropTypes.string.isRequired,
+    }).isRequired,
+  ).isRequired,
+  initialTab: PropTypes.string,
+  TabsProps: PropTypes.shape({}),
+  SingleTabProps: PropTypes.shape({}),
+};
+TabsForm.defaultProps = {
+  initialTab: undefined,
+  TabsProps: {},
+  SingleTabProps: {},
+};
 
 export default TabsForm;

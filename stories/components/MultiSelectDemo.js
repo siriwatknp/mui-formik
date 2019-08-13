@@ -14,15 +14,14 @@ const useCustomStyles = makeStyles(({ spacing, palette }) => ({
       backgroundColor: palette.grey[200],
     },
   },
+  fieldFocused: {
+    '&$field': {
+      backgroundColor: palette.grey[200],
+    },
+  },
   chipRoot: {
     backgroundColor: palette.common.white,
     border: `1px solid ${palette.grey[300]}`,
-  },
-  inputRoot: {},
-  inputFocused: {
-    '&$inputRoot': {
-      backgroundColor: palette.grey[200],
-    },
   },
   menuContainer: {
     borderRadius: spacing(1),
@@ -37,9 +36,9 @@ const useCustomStyles = makeStyles(({ spacing, palette }) => ({
   },
   optionSelected: {
     fontWeight: 500,
-    color: palette.primary.main,
     '&$option': {
       backgroundColor: palette.grey[100],
+      color: palette.primary.main,
       '&:hover': {
         backgroundColor: '#ff5252',
         color: palette.common.white,
@@ -75,20 +74,12 @@ const MultiSelectDemo = props => {
           'Custom styles',
           <MultipleSelect
             {...props}
-            {...MultipleSelect.getProps({
-              classes: customStyles,
-            })}
-            // classes={customStyles}
+            classes={customStyles}
             variant={'filled'}
             label={''}
             InputProps={{
               disableUnderline: true,
             }}
-            inputClasses={{
-              root: customStyles.inputRoot,
-              focused: customStyles.inputFocused,
-            }}
-            optionOverrides={customStyles}
           />,
         ],
         [

@@ -15,6 +15,9 @@ const baseTheme = createMuiTheme({
     primary: {
       main: '#1890ff',
     },
+    error: {
+      main: '#ff5252',
+    },
   },
 });
 const ThemeDecorator = storyFn => (

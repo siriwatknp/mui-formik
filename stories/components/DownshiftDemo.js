@@ -10,12 +10,6 @@ const useCustomStyles = makeStyles(({ spacing, palette }) => ({
     padding: 0,
     paddingBottom: 4,
   },
-  inputRoot: {},
-  inputFocused: {
-    '&$inputRoot': {
-      backgroundColor: palette.grey[200],
-    },
-  },
   iconBtn: {
     padding: spacing(1),
   },
@@ -50,7 +44,7 @@ const DownshiftDemo = props => {
           <DownshiftSelect
             {...props}
             variant={'standard'}
-            {...DownshiftSelect.getProps({ classes: customStyles })}
+            classes={customStyles}
             SvgClearIcon={ClearRounded}
           />,
         ],

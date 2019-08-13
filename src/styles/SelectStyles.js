@@ -1,3 +1,4 @@
+import { mergeStyleCreators } from 'mui-styling';
 import { makeStyles } from '@material-ui/styles';
 import { antChipStyles } from './ChipStyles';
 import { antInputBaseStyles } from './InputBaseStyles';
@@ -5,8 +6,13 @@ import { antOptionStyles } from './OptionStyles';
 import { antOptionMenuStyles } from './OptionMenuStyles';
 import { antIconBtnStyles } from './IconButtonStyles';
 
-export const antSelectStyles = theme => {
-  return {
+export const antSelectStyles = mergeStyleCreators(
+  antInputBaseStyles,
+  antIconBtnStyles,
+  antChipStyles,
+  antOptionMenuStyles,
+  antOptionStyles,
+  {
     container: {
       position: 'relative',
       display: 'inline-block',
@@ -14,15 +20,8 @@ export const antSelectStyles = theme => {
     containerFullWidth: {
       display: 'block',
     },
-    optionHighlighted: {},
-    optionSelected: {},
-    ...antInputBaseStyles(theme),
-    ...antIconBtnStyles(theme),
-    ...antChipStyles(theme),
-    ...antOptionMenuStyles(theme),
-    ...antOptionStyles(theme),
-  };
-};
+  },
+);
 
 export const useAntSelectStyles = makeStyles(antSelectStyles);
 

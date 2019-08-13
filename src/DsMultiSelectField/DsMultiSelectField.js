@@ -11,6 +11,7 @@ const Component = ({ field, form, helperText, ...props }) => {
     <DownshiftMultiSelect
       error={errorShown}
       helperText={errorShown ? errorText : helperText}
+      {...field}
       onChange={handleChange}
       onBlur={handleChange}
       {...props}

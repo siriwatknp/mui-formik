@@ -34,7 +34,6 @@ storiesOf('Components', module)
     <OptionDemo
       highlighted={boolean('highlighted', false)}
       selected={boolean('selected', false)}
-      hoverless={boolean('hoverless', false)}
     />
   ))
   .add('Option Menu', () => (
@@ -70,9 +69,7 @@ storiesOf('Components', module)
             filterOption: filterOption ? filterByInputValue : false,
             getOptions: matchSorter ? getOptions : false,
           };
-          return (
-            <MultiSelectDemo {...props} />
-          );
+          return <MultiSelectDemo {...props} />;
         }}
       </StateProvider>
     );

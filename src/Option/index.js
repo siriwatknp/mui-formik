@@ -1,3 +1,3 @@
-export { default as styles } from './styles';
+export { default as createStyles } from './Option.styles';
 
 export { default } from './Option';

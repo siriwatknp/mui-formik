@@ -8128,6 +8128,11 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
+mui-styling@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/mui-styling/-/mui-styling-0.1.0.tgz#d2e7351eae848ae96928e92ba619fce647e4422f"
+  integrity sha512-hsmNjSfeVFrbQYTkk9ehsm96Dyjl3rviLhZVL+fY15pdsW2F4FpgcMFbUJkC2bFa/08ODCSwv2Papp+UAwuCqw==
+
 multimatch@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/multimatch/-/multimatch-3.0.0.tgz#0e2534cc6bc238d9ab67e1b9cd5fcd85a6dbf70b"

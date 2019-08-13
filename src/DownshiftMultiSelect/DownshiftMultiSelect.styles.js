@@ -1,4 +1,7 @@
-const styles = ({ spacing }) => ({
+import { mergeStyleCreators } from 'mui-styling';
+import { createStyles } from '../OptionMenu';
+
+export default mergeStyleCreators(createStyles, ({ spacing }) => ({
   // Root CSS
   container: {
     position: 'relative',
@@ -37,20 +40,4 @@ const styles = ({ spacing }) => ({
   // Clear Btn
   clearBtn: {},
   // the rest is OptionMenu CSS API
-});
-
-styles.traits = [
-  'container',
-  'containerFullWidth',
-  'field',
-  'fieldInput',
-  'fieldFocused',
-  'fieldNotchedOutline',
-  'chipRoot',
-  'iconBtn',
-  'iconBtnLabel',
-  'toggleBtn',
-  'clearBtn',
-];
-
-export default styles;
+}));

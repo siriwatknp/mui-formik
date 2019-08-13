@@ -1,6 +1,20 @@
 export const defaultItemToValue = item => (item ? item.value : '');
 export const defaultItemToLabel = item => (item ? item.label : '');
 
+export const getSelectedItems = (options, value, params = {}) => {
+  const {
+    fullOptionReturned = false,
+    itemToValue = defaultItemToValue,
+  } = params;
+  if (value) {
+    if (fullOptionReturned) {
+      return options.filter(item => value.includes(item));
+    }
+    return options.filter(item => value.includes(itemToValue(item)));
+  }
+  return [];
+};
+
 export const injectMenuProps = (
   {
     menuId,

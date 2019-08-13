@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import cx from 'clsx';
-import { withStyles } from '@material-ui/styles';
+import { withStyles } from 'mui-styling';
 import TextField from '@material-ui/core/TextField';
 import Chip from '@material-ui/core/Chip';
-import styles from './styles';
+import createStyles from './MultiSelect.styles';
 import OptionMenu from '../OptionMenu';
 import {
   injectMenuProps,
@@ -12,22 +12,21 @@ import {
   getMultiSelectLogic,
   defaultItemToLabel,
   defaultItemToValue,
+  getSelectedItems,
 } from '../logics/select';
-import {
-  filterByInputValue,
-  getMultiSelectOptions,
-  pick,
-} from '../utils/functions';
+import { filterByInputValue, getMultiSelectOptions } from '../utils/functions';
 import Collection from '../utils/collection';
 
-const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
+const MultiSelect = withStyles(createStyles, { name: 'MultiSelect' })(props => {
   const {
+    forceOpen,
     options,
     menuId,
     chipId,
     variant,
     fullWidth,
     onChangeInput,
+    value,
     onChange,
     onFocus,
     onBlur,
@@ -40,14 +39,27 @@ const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
     inputClasses,
     ChipProps,
     chipClasses,
-    classes,
-    overrides,
+    css,
   } = props;
-  const css = overrides || classes;
   const inputRef = useRef(null);
   const [inputValue, setInputValue] = useState('');
-  const [selectedItems, setSelectedItems] = useState([]);
+  const [selectedItems, setSelectedItems] = useState(
+    getSelectedItems(options, value, {
+      fullOptionReturned,
+      itemToValue,
+    }),
+  );
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (value) {
+      setSelectedItems(
+        getSelectedItems(options, value, {
+          fullOptionReturned,
+          itemToValue,
+        }),
+      );
+    }
+  }, [value]);
   const returnValue = cb => (items, ...args) => {
     return fullOptionReturned ? cb(items, ...args) : cb(items.map(itemToValue));
   };
@@ -133,7 +145,7 @@ const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
           onKeyDown: handleKeyDown(inputValue),
         }}
       />
-      {open && (
+      {(forceOpen || open) && (
         <OptionMenu
           {...injectMenuProps(
             {
@@ -156,6 +168,7 @@ const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
               }),
             },
           )}
+          {...OptionMenu.getOverrides(css, props)}
           {...OptionMenu.getProps(props)}
         />
       )}
@@ -164,6 +177,7 @@ const MultiSelect = withStyles(styles, { name: 'MultiSelect' })(props => {
 });
 
 MultiSelect.propTypes = {
+  forceOpen: PropTypes.bool,
   options: PropTypes.arrayOf(
     PropTypes.oneOfType([
       PropTypes.shape({}),
@@ -195,6 +209,7 @@ MultiSelect.propTypes = {
   ChipProps: PropTypes.shape({}),
 };
 MultiSelect.defaultProps = {
+  forceOpen: false, // for debugging purpose
   options: [],
   menuId: '__menu__',
   chipId: '__chip__',
@@ -215,36 +230,19 @@ MultiSelect.defaultProps = {
   chipClasses: {},
   ChipProps: {},
 };
-MultiSelect.pickClasses = classes => pick(classes, styles.traits);
 MultiSelect.getProps = ({
   // use this fn when this component render as nested component
-  multiSelectClasses,
-  classes,
-  multiSelectOverrides,
-  overrides,
   InputProps,
   inputProps,
   inputClasses,
   ChipProps,
   chipClasses,
-  ...props
-}) => {
-  const resultClasses = MultiSelect.pickClasses(multiSelectClasses || classes);
-  const resultOverrides = MultiSelect.pickClasses(
-    multiSelectOverrides || overrides,
-  );
-  return {
-    ...OptionMenu.getProps({ classes, overrides, ...props }),
-    InputProps,
-    inputProps,
-    inputClasses,
-    ChipProps,
-    chipClasses,
-    classes: resultClasses,
-    overrides: resultOverrides,
-    multiSelectClasses: resultClasses,
-    multiSelectOverrides: resultOverrides,
-  };
-};
+}) => ({
+  InputProps,
+  inputProps,
+  inputClasses,
+  ChipProps,
+  chipClasses,
+});
 
 export default MultiSelect;
