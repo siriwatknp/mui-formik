@@ -15,8 +15,8 @@ storiesOf('Form', module)
   .add('Login form', () => <LoginForm />)
   .add('Sign Up Form', () => <SignUpForm />)
   .add('Language Form', () => <LanguageForm />)
-  .add('Profile Form', () => <ProfileForm />)
-  .add('Array Form', () => <ArrayForm />)
+  .add('Profile Form', () => <ProfileForm />);
+// .add('Array Form', () => <ArrayForm />)
 
 // import { Button, Welcome } from '@storybook/react/demo';
 

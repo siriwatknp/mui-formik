@@ -34,7 +34,7 @@ const Component = ({
   );
 };
 
-const TabsForm = ({
+const TabsField = ({
   initialTab,
   name,
   tabs,
@@ -64,7 +64,7 @@ const TabsForm = ({
   );
 };
 
-TabsForm.propTypes = {
+TabsField.propTypes = {
   tabs: PropTypes.arrayOf(
     PropTypes.shape({
       value: PropTypes.string.isRequired,
@@ -74,10 +74,10 @@ TabsForm.propTypes = {
   TabsProps: PropTypes.shape({}),
   SingleTabProps: PropTypes.shape({}),
 };
-TabsForm.defaultProps = {
+TabsField.defaultProps = {
   initialTab: undefined,
   TabsProps: {},
   SingleTabProps: {},
 };
 
-export default TabsForm;
+export default TabsField;

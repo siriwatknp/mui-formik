@@ -28,9 +28,6 @@ const SignUpForm = () => (
       confirmedPassword: '',
       accepted: false,
     }}
-    onSubmit={values => {
-      console.log('values', values);
-    }}
     validationSchema={validationSchema}
   >
     <TextField {...TextField.baseProps} name="email" label="Email" required />

@@ -2,7 +2,7 @@ import React from 'react';
 import * as Yup from 'yup';
 import Form from './Form';
 import TextField from '../../src/TextField';
-import TabsForm from '../../src/TabsForm';
+import TabsField from '../../src/TabsField';
 
 const validationSchema = Yup.object().shape({
   name: Yup.object().shape({
@@ -20,10 +20,9 @@ const LanguageForm = () => {
           th: '',
         },
       }}
-      onSubmit={console.log}
       validationSchema={validationSchema}
     >
-      <TabsForm
+      <TabsField
         name={'name'}
         tabs={[
           { label: 'English', value: 'en' },
@@ -37,7 +36,7 @@ const LanguageForm = () => {
             label={tab}
           />
         )}
-      </TabsForm>
+      </TabsField>
     </Form>
   );
 };

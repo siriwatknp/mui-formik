@@ -16,11 +16,6 @@ const LoginForm = () => (
   <Form
     validationSchema={validationSchema}
     initialValues={{ email: '', password: '' }}
-    onSubmit={(values, actions) => {
-      console.log('values', values);
-      console.log('actions', actions);
-      actions.setSubmitting(false);
-    }}
   >
     <TextField {...TextField.baseProps} name="email" label="Email" required />
     <TextField

@@ -2,7 +2,7 @@ import React from 'react';
 import * as Yup from 'yup';
 import Link from '@material-ui/core/Link';
 import Form from './Form';
-import TabsForm from '../../src/TabsForm';
+import TabsField from '../../src/TabsField';
 import TextField from '../../src/TextField';
 import CheckLabelField from '../../src/CheckLabelField';
 import DsSelectField from '../../src/DsSelectField';
@@ -48,9 +48,8 @@ const ProfileForm = () => (
       accepted: false,
     }}
     validationSchema={validationSchema}
-    onSubmit={values => console.log(values)}
   >
-    <TabsForm
+    <TabsField
       name={'profile'}
       tabs={[
         { label: 'Basic info', value: 'basicInfo' },
@@ -97,7 +96,7 @@ const ProfileForm = () => (
           )}
         </>
       )}
-    </TabsForm>
+    </TabsField>
     <CheckLabelField
       {...CheckLabelField.baseProps}
       name={'accepted'}

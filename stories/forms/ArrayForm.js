@@ -17,15 +17,8 @@ const schema = Yup.object().shape({
 });
 
 const ArrayForm = () => (
-  <Form
-    initialValues={{ friends: [] }}
-    validationSchema={schema}
-    onSubmit={values => console.log('values', values)}
-  >
+  <Form initialValues={{ friends: [] }} validationSchema={schema}>
     {({ values, errors, touched }) => {
-      console.log('values', values);
-      console.log('touched', touched);
-      console.log('errors', errors);
       return (
         <FieldArray name={'friends'}>
           {arrayHelpers => (
@@ -51,13 +44,13 @@ const ArrayForm = () => (
                       type="button"
                       onClick={() => arrayHelpers.insert(index, '')} // insert an empty string at a position
                     >
-                      <Add/>
+                      <Add />
                     </IconButton>
                     <IconButton
                       type="button"
                       onClick={() => arrayHelpers.remove(index)} // remove a friend from the list
                     >
-                      <Delete/>
+                      <Delete />
                     </IconButton>
                   </Box>
                 ))

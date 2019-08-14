@@ -1,1 +1,1 @@
-export { default } from './TabsForm';
+export { default } from './TabsField';
